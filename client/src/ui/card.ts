@@ -11,6 +11,10 @@ interface CardOptions {
   onClick?: (card: Card) => void;
 }
 
+interface NobleTileOptions {
+  showRequirementNumbers?: boolean;
+}
+
 const RGBA_BY_COLOR: Record<GemColor, string> = {
   white: 'rgba(240,237,224,0.34)',
   blue: 'rgba(79,163,209,0.34)',
@@ -150,7 +154,12 @@ export function renderDeckPlaceholder(
 
 // ─── Noble tile element ────────────────────────────────────────────────────────
 
-export function renderNobleTile(noble: Noble, size: 'sz-md' | 'sz-sm' = 'sz-md'): HTMLElement {
+export function renderNobleTile(
+  noble: Noble,
+  size: 'sz-md' | 'sz-sm' = 'sz-md',
+  opts: NobleTileOptions = {},
+): HTMLElement {
+  const { showRequirementNumbers = true } = opts;
   const el = document.createElement('div');
   el.className = `noble-tile ${size}`;
   const nobleArtUrl = getNobleArtUrl(noble);
@@ -170,19 +179,23 @@ export function renderNobleTile(noble: Noble, size: 'sz-md' | 'sz-sm' = 'sz-md')
     const n = noble.requirement[color];
     if (n === 0) continue;
 
-    const row = document.createElement('div');
-    row.className = 'noble-req-row';
-
     const pip = document.createElement('div');
     pip.className = `card-cost-pip ${color}`;
 
-    const num = document.createElement('span');
-    num.className = 'noble-req-num';
-    num.textContent = String(n);
+    if (showRequirementNumbers) {
+      const row = document.createElement('div');
+      row.className = 'noble-req-row';
 
-    row.appendChild(pip);
-    row.appendChild(num);
-    req.appendChild(row);
+      const num = document.createElement('span');
+      num.className = 'noble-req-num';
+      num.textContent = String(n);
+
+      row.appendChild(pip);
+      row.appendChild(num);
+      req.appendChild(row);
+    } else {
+      req.appendChild(pip);
+    }
   }
 
   el.appendChild(vp);

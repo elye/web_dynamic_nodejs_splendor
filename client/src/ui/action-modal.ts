@@ -314,7 +314,7 @@ export function openNobleChoiceModal(nobles: Noble[]): void {
     btn.className = 'noble-choice-btn';
     btn.type = 'button';
     btn.title = 'Choose this noble';
-    btn.appendChild(renderNobleTile(noble, 'sz-sm'));
+    btn.appendChild(renderNobleTile(noble, 'sz-sm', { showRequirementNumbers: false }));
     btn.addEventListener('click', () => {
       send({ type: 'CHOOSE_NOBLE', nobleId: noble.id });
       closeModal();
