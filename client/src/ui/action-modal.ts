@@ -16,6 +16,9 @@ function openModal(content: HTMLElement): void {
   });
   const box = document.createElement('div');
   box.className = 'modal-box';
+  if (content.classList.contains('discard-modal')) {
+    box.classList.add('modal-box-discard');
+  }
   box.appendChild(content);
   modalOverlay.appendChild(box);
   document.body.appendChild(modalOverlay);
@@ -419,6 +422,9 @@ const modalStyles = `
   width: 90%;
   display: flex; flex-direction: column; gap: 16px;
 }
+.modal-box.modal-box-discard {
+  max-width: 520px;
+}
 .modal-box h3 { color: var(--gem-gold); font-size: 1.2rem; }
 .modal-box p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
 .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
@@ -429,7 +435,10 @@ const modalStyles = `
 .picker-info { font-size: 0.72rem; color: var(--text-muted); }
 .gem-picker-modal { display: flex; flex-direction: column; gap: 16px; align-items: center; }
 .discard-modal { align-items: stretch; width: 100%; }
-.discard-modal .picker-grid { justify-content: space-evenly; }
+.discard-modal .picker-grid {
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
 .discard-modal .discard-picker-col {
   flex-direction: row;
   min-width: 64px;
