@@ -14,6 +14,7 @@ import {
   openCardModal,
   openDeckReserveModal,
   openDiscardModal,
+  openNobleChoiceModal,
   closeModal,
 } from './ui/action-modal.js';
 import { GEM_COLORS } from '@splendor/shared';
@@ -31,11 +32,14 @@ onMessage((msg) => {
     case 'ROOM_UPDATE': setRoom(msg.room); break;
     case 'GAME_STATE': {
       setGame(msg.state);
-      // If there's a pending discard for the local player, show modal
+      // If there's a pending discard/noble choice for the local player, show modal.
       const { myPlayerId } = getState();
       const discard = msg.state.pendingDiscard;
+      const nobleChoice = msg.state.pendingNobleChoice;
       if (discard && discard.playerId === myPlayerId) {
         openDiscardModal(discard.excess, msg.state.players.find(p => p.id === myPlayerId)?.gems ?? {});
+      } else if (nobleChoice && nobleChoice.playerId === myPlayerId) {
+        openNobleChoiceModal(nobleChoice.nobles);
       } else {
         closeModal();
       }
@@ -183,7 +187,8 @@ function renderGameScreen(state: AppState): void {
 
   const myPlayer = game.players.find(p => p.id === myPlayerId) ?? null;
   const myIndex = game.players.findIndex(p => p.id === myPlayerId);
-  const isMyTurn = game.phase === 'playing' && game.currentPlayerIndex === myIndex && !game.pendingDiscard;
+  const hasPendingGate = Boolean(game.pendingDiscard || game.pendingNobleChoice);
+  const isMyTurn = game.phase === 'playing' && game.currentPlayerIndex === myIndex && !hasPendingGate;
   const opponents = game.players.filter(p => p.id !== myPlayerId);
 
   if (!isMyTurn) {

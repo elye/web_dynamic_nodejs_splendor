@@ -3,7 +3,7 @@ import type { InternalGameState } from '../game-engine/deck.js';
 import { easyMove } from './easy.js';
 import { mediumMove } from './medium.js';
 import { hardMove } from './hard.js';
-import { awardNobles } from '../game-engine/nobles.js';
+import { getQualifyingNobles, awardNobleById } from '../game-engine/nobles.js';
 import { hasTriggeredEndgame, checkAndResolveEndgame } from '../game-engine/endgame.js';
 
 const AI_DELAY_MS = 1200; // artificial thinking delay
@@ -39,8 +39,17 @@ export async function executeAiTurn(
     autoDiscard(game, playerIndex, result.pendingDiscard);
   }
 
-  // Award nobles
-  awardNobles(game.players[playerIndex], game.nobles);
+  // AI claims at most one noble per turn; pick the highest-requirement one.
+  const qualifyingNobles = getQualifyingNobles(game.players[playerIndex], game.nobles);
+  if (qualifyingNobles.length > 0) {
+    qualifyingNobles.sort((a, b) => {
+      const reqA = Object.values(a.requirement).reduce((sum, n) => sum + n, 0);
+      const reqB = Object.values(b.requirement).reduce((sum, n) => sum + n, 0);
+      if (reqA !== reqB) return reqB - reqA;
+      return a.id.localeCompare(b.id);
+    });
+    awardNobleById(game.players[playerIndex], game.nobles, qualifyingNobles[0].id);
+  }
 
   // Check if this turn triggered endgame
   const triggeredNow = !endgameTriggered && hasTriggeredEndgame(game);

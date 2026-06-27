@@ -19,7 +19,7 @@ import {
   applyReserveCard,
   applyDiscardGems,
 } from './game-engine/actions.js';
-import { awardNobles } from './game-engine/nobles.js';
+import { getQualifyingNobles, awardNobleById } from './game-engine/nobles.js';
 import { hasTriggeredEndgame, checkAndResolveEndgame } from './game-engine/endgame.js';
 import { toClientState } from './game-engine/deck.js';
 import type { InternalGameState } from './game-engine/deck.js';
@@ -127,7 +127,8 @@ async function handleMessage(socket: WebSocket, msg: ClientMessage): Promise<voi
     case 'TAKE_GEMS':
     case 'BUY_CARD':
     case 'RESERVE_CARD':
-    case 'DISCARD_GEMS': {
+    case 'DISCARD_GEMS':
+    case 'CHOOSE_NOBLE': {
       const room = state.roomCode ? getRoom(state.roomCode) : undefined;
       if (!room?.game) return;
       if (!isCurrentPlayer(room, state.playerId)) {
@@ -137,6 +138,57 @@ async function handleMessage(socket: WebSocket, msg: ClientMessage): Promise<voi
 
       const game = room.game as InternalGameState;
       const playerIndex = game.currentPlayerIndex;
+
+      if (msg.type === 'CHOOSE_NOBLE') {
+        const pendingChoice = game.pendingNobleChoice;
+        if (!pendingChoice || pendingChoice.playerId !== state.playerId) {
+          send(socket, { type: 'ERROR', code: 'INVALID_ACTION', message: 'No noble choice is pending' });
+          return;
+        }
+
+        const awarded = awardNobleById(game.players[playerIndex], game.nobles, msg.nobleId);
+        if (!awarded) {
+          send(socket, { type: 'ERROR', code: 'INVALID_ACTION', message: 'Invalid noble selection' });
+          return;
+        }
+
+        game.pendingNobleChoice = undefined;
+        completeTurn(room, game);
+
+        broadcastGameState(room);
+        if (room.phase === 'playing') {
+          await runAiTurnsIfNeeded(room);
+        }
+        return;
+      }
+
+      if (game.pendingNobleChoice) {
+        send(socket, {
+          type: 'ERROR',
+          code: 'INVALID_ACTION',
+          message: 'Choose a noble before taking another action',
+        });
+        return;
+      }
+
+      const hadPendingDiscard = game.pendingDiscard?.playerId === state.playerId;
+      if (game.pendingDiscard && msg.type !== 'DISCARD_GEMS') {
+        send(socket, {
+          type: 'ERROR',
+          code: 'INVALID_ACTION',
+          message: 'You must discard gems before taking another action',
+        });
+        return;
+      }
+      if (msg.type === 'DISCARD_GEMS' && !hadPendingDiscard) {
+        send(socket, {
+          type: 'ERROR',
+          code: 'INVALID_ACTION',
+          message: 'No discard is pending',
+        });
+        return;
+      }
+
       let result;
 
       if (msg.type === 'TAKE_GEMS') {
@@ -164,14 +216,21 @@ async function handleMessage(socket: WebSocket, msg: ClientMessage): Promise<voi
       // Discard completed or not needed
       game.pendingDiscard = undefined;
 
-      // Only advance turn after a non-discard action
-      if (msg.type !== 'DISCARD_GEMS') {
-        awardNobles(game.players[playerIndex], game.nobles);
-        const triggered = hasTriggeredEndgame(game);
-        if (triggered) endgameFlags.set(room.code, true);
-        game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
-        if (checkAndResolveEndgame(game, endgameFlags.get(room.code) ?? false)) {
-          room.phase = 'finished';
+      // Complete the turn for normal actions and for discard finishing a pending discard.
+      if (msg.type !== 'DISCARD_GEMS' || hadPendingDiscard) {
+        const qualifyingNobles = getQualifyingNobles(game.players[playerIndex], game.nobles);
+        if (qualifyingNobles.length === 1) {
+          awardNobleById(game.players[playerIndex], game.nobles, qualifyingNobles[0].id);
+          completeTurn(room, game);
+        } else if (qualifyingNobles.length > 1) {
+          game.pendingNobleChoice = {
+            playerId: state.playerId,
+            nobles: qualifyingNobles,
+          };
+          broadcastGameState(room);
+          return;
+        } else {
+          completeTurn(room, game);
         }
       }
 
@@ -218,6 +277,17 @@ function isCurrentPlayer(room: Room, playerId: string): boolean {
   if (!game) return false;
   const slot = room.slots[game.currentPlayerIndex];
   return slot?.playerId === playerId && slot.type === 'human';
+}
+
+function completeTurn(room: Room, game: InternalGameState): void {
+  const triggered = hasTriggeredEndgame(game);
+  if (triggered) endgameFlags.set(room.code, true);
+
+  game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+
+  if (checkAndResolveEndgame(game, endgameFlags.get(room.code) ?? false)) {
+    room.phase = 'finished';
+  }
 }
 
 function broadcastGameState(room: Room): void {

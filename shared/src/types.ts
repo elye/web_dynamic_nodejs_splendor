@@ -68,6 +68,8 @@ export interface GameState {
   winnerIds?: string[];
   // Pending discard: player must discard down to 10 gems before turn ends
   pendingDiscard?: { playerId: string; excess: number };
+  // Pending noble choice: player must choose one qualifying noble before turn ends
+  pendingNobleChoice?: { playerId: string; nobles: Noble[] };
 }
 
 // ─── Room ────────────────────────────────────────────────────────────────────
@@ -134,6 +136,11 @@ export interface MsgDiscardGems {
   gems: GemPool;  // gems to return to bank
 }
 
+export interface MsgChooseNoble {
+  type: 'CHOOSE_NOBLE';
+  nobleId: string;
+}
+
 export type ClientMessage =
   | MsgJoinRoom
   | MsgCreateRoom
@@ -141,7 +148,8 @@ export type ClientMessage =
   | MsgTakeGems
   | MsgBuyCard
   | MsgReserveCard
-  | MsgDiscardGems;
+  | MsgDiscardGems
+  | MsgChooseNoble;
 
 // ─── Server → Client messages ─────────────────────────────────────────────────
 
