@@ -1,0 +1,105 @@
+/* ─── Game layout ──────────────────────────────────────────────────────────── */
+
+.game-layout {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 1fr;
+  height: 100vh;
+  overflow: hidden;
+  gap: 0;
+}
+
+/* Top: opponent strips */
+.opponents-bar {
+  display: flex;
+  gap: var(--gap-sm);
+  padding: var(--gap-sm) var(--gap);
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+/* Middle: board + gem bank */
+.game-center {
+  display: flex;
+  gap: var(--gap);
+  padding: var(--gap);
+  overflow: hidden;
+  align-items: flex-start;
+  justify-content: center;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Bottom: my panel */
+.my-panel-bar {
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border-subtle);
+  padding: var(--gap-sm) var(--gap);
+  flex-shrink: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* ─── Board ────────────────────────────────────────────────────────────────── */
+.board-area {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  align-items: center;
+}
+
+/* Noble row */
+.noble-row {
+  display: flex;
+  gap: var(--gap-sm);
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tier row (deck + 4 cards) */
+.tier-row {
+  display: flex;
+  gap: var(--gap-sm);
+  align-items: center;
+}
+
+/* ─── Gem bank panel ───────────────────────────────────────────────────────── */
+.bank-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  align-items: center;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: var(--gap);
+  flex-shrink: 0;
+}
+
+.bank-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.bank-gems {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+}
+
+.bank-gem-row {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+}
+
+.bank-gem-count {
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-width: 16px;
+  text-align: right;
+}

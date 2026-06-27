@@ -1,0 +1,134 @@
+/* ─── Opponent strips ──────────────────────────────────────────────────────── */
+
+.opponent-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  min-width: 180px;
+  flex-shrink: 0;
+  transition: border-color 0.3s;
+}
+.opponent-strip.active-turn {
+  border-color: var(--gem-gold);
+  box-shadow: 0 0 0 1px var(--gem-gold);
+}
+.opponent-strip .player-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90px;
+}
+.opponent-strip .player-pts {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--gem-gold);
+  margin-left: auto;
+}
+.opponent-strip .mini-gems { display: flex; gap: 3px; flex-wrap: wrap; max-width: 80px; }
+.opponent-strip .mini-bonuses { display: flex; gap: 3px; flex-wrap: wrap; }
+.mini-bonus { font-size: 0.65rem; font-weight: 700; padding: 1px 4px; border-radius: 3px; }
+.mini-bonus.white { background: var(--gem-white); color: #333; }
+.mini-bonus.blue  { background: var(--gem-blue); }
+.mini-bonus.green { background: var(--gem-green); }
+.mini-bonus.red   { background: var(--gem-red); }
+.mini-bonus.black { background: var(--gem-black); }
+.reserved-badge { font-size: 0.68rem; background: rgba(255,255,255,0.1); padding: 1px 6px; border-radius: 4px; color: var(--text-muted); }
+
+/* ─── My panel ────────────────────────────────────────────────────────────── */
+
+.my-panel {
+  display: flex;
+  gap: var(--gap);
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.my-panel-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  flex-shrink: 0;
+}
+
+.section-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.my-gems-grid {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.my-gem-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.my-gem-count {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.my-bonuses-row {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.my-bonus-chip {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.my-bonus-chip.white { background: var(--gem-white); color: #333; }
+.my-bonus-chip.blue  { background: var(--gem-blue); }
+.my-bonus-chip.green { background: var(--gem-green); }
+.my-bonus-chip.red   { background: var(--gem-red); }
+.my-bonus-chip.black { background: var(--gem-black); }
+
+.my-reserved-row {
+  display: flex;
+  gap: var(--gap-sm);
+}
+
+.my-points-badge {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--gem-gold);
+  line-height: 1;
+}
+
+.my-nobles-row {
+  display: flex;
+  gap: var(--gap-sm);
+}
+
+/* Turn highlight */
+.my-panel-bar.my-turn {
+  border-top-color: var(--gem-gold);
+  background: rgba(245,200,66,0.07);
+}
+
+.my-turn-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gem-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}

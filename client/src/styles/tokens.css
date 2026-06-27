@@ -1,0 +1,88 @@
+/* ─── Gem token circles ─────────────────────────────────────────────────── */
+
+.gem-token {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  border: 2px solid rgba(255,255,255,0.35);
+  box-shadow: inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 6px rgba(0,0,0,0.3);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* Sizes */
+.gem-token.sz-lg  { width: 44px; height: 44px; font-size: 1rem; }
+.gem-token.sz-md  { width: 32px; height: 32px; font-size: 0.8rem; }
+.gem-token.sz-sm  { width: 22px; height: 22px; font-size: 0.65rem; }
+
+/* Colours */
+.gem-token.white { background: radial-gradient(circle at 40% 35%, #fff 0%, #c9c4ae 100%); color: #555; }
+.gem-token.blue  { background: radial-gradient(circle at 40% 35%, #7bc8ec 0%, #2d7aab 100%); }
+.gem-token.green { background: radial-gradient(circle at 40% 35%, #7ed98a 0%, #2e7d42 100%); }
+.gem-token.red   { background: radial-gradient(circle at 40% 35%, #f08080 0%, #a82020 100%); }
+.gem-token.black { background: radial-gradient(circle at 40% 35%, #666 0%, #111 100%); }
+.gem-token.gold  { background: radial-gradient(circle at 40% 35%, #fff0a0 0%, #c8960a 100%); color: #5a3800; }
+
+/* Interactive (clickable) tokens */
+.gem-token.clickable {
+  cursor: pointer;
+  transition: transform 0.15s, filter 0.15s;
+}
+.gem-token.clickable:hover { transform: scale(1.12); filter: brightness(1.15); }
+.gem-token.clickable.selected {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+  transform: scale(1.08);
+}
+.gem-token.clickable:disabled, .gem-token.clickable[data-disabled="true"] {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ─── Gem bank row ────────────────────────────────────────────────────────── */
+.gem-bank {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.gem-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.gem-stack-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* ─── Compact gem pip row (used on cards & player panels) ──────────────────── */
+.gem-pips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.gem-pip {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.25);
+  flex-shrink: 0;
+}
+.gem-pip.white { background: var(--gem-white); }
+.gem-pip.blue  { background: var(--gem-blue); }
+.gem-pip.green { background: var(--gem-green); }
+.gem-pip.red   { background: var(--gem-red); }
+.gem-pip.black { background: var(--gem-black); }
+.gem-pip.gold  { background: var(--gem-gold); }

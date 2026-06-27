@@ -1,0 +1,237 @@
+/* ─── Reset & base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Gem colours */
+  --gem-white:  #f0ede0;
+  --gem-blue:   #4fa3d1;
+  --gem-green:  #5aab6d;
+  --gem-red:    #d94f4f;
+  --gem-black:  #333333;
+  --gem-gold:   #f5c842;
+
+  /* Card tier backgrounds */
+  --tier1-bg:   #e8dfc8;
+  --tier1-border: #c9b98a;
+  --tier2-bg:   #f7e07a;
+  --tier2-border: #d4b800;
+  --tier3-bg:   #2a3a6e;
+  --tier3-border: #1a2558;
+  --tier3-text: #e8e8f5;
+
+  /* UI */
+  --bg-table:   #1a3a1a;   /* felt green */
+  --bg-panel:   #0e1f0e;
+  --bg-card:    #fff;
+  --text-primary: #f0ede0;
+  --text-muted:   #9aaa9a;
+  --border-subtle: rgba(255,255,255,0.12);
+  --shadow:     0 4px 16px rgba(0,0,0,0.4);
+  --radius:     8px;
+  --radius-sm:  4px;
+
+  /* Spacing */
+  --gap: 12px;
+  --gap-sm: 6px;
+  --gap-lg: 20px;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  background: var(--bg-table);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+#app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Typography ─────────────────────────────────────────────────────────── */
+h1, h2, h3 { font-weight: 700; letter-spacing: 0.02em; }
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 22px;
+  border: none;
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+  letter-spacing: 0.03em;
+}
+.btn:hover:not(:disabled) { filter: brightness(1.15); }
+.btn:active:not(:disabled) { transform: scale(0.97); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-primary  { background: var(--gem-gold); color: #1a1000; }
+.btn-secondary { background: rgba(255,255,255,0.12); color: var(--text-primary); border: 1px solid var(--border-subtle); }
+.btn-danger   { background: var(--gem-red); color: #fff; }
+.btn-sm { padding: 5px 12px; font-size: 0.8rem; }
+
+/* ─── Scrollbars ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+/* ─── Lobby screen ───────────────────────────────────────────────────────── */
+.lobby-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-lg);
+  padding: var(--gap-lg);
+  overflow-y: auto;
+}
+
+.lobby-logo { text-align: center; }
+.logo-title {
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  background: linear-gradient(135deg, var(--gem-gold) 0%, #fff8d6 50%, var(--gem-gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  letter-spacing: 0.1em;
+}
+.logo-sub { color: var(--text-muted); font-style: italic; }
+
+.lobby-cards {
+  display: flex;
+  gap: var(--gap-lg);
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 760px;
+  width: 100%;
+}
+
+.lobby-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: var(--gap-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  min-width: 280px;
+  flex: 1;
+  max-width: 340px;
+}
+.lobby-card h2 { font-size: 1.2rem; color: var(--gem-gold); }
+
+.lobby-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.lobby-card input,
+.lobby-card select {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: 7px 10px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.lobby-card input:focus,
+.lobby-card select:focus { border-color: var(--gem-gold); }
+
+.lobby-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 0 4px;
+}
+
+.error-msg { color: var(--gem-red); font-size: 0.82rem; min-height: 1.1em; }
+
+/* AI slot config */
+.ai-slots-label { font-size: 0.82rem; color: var(--text-muted); }
+.ai-slot-row {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  font-size: 0.85rem;
+}
+.slot-label { width: 48px; color: var(--text-muted); }
+.slot-toggle { display: flex; align-items: center; gap: 4px; cursor: pointer; flex: 1; color: var(--text-primary); }
+.diff-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: var(--text-primary); border-radius: var(--radius-sm); padding: 3px 6px; font-size: 0.8rem; }
+
+/* ─── Waiting room ───────────────────────────────────────────────────────── */
+.waiting-room {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap);
+  padding: var(--gap-lg);
+}
+.room-title { font-size: 1.6rem; }
+.room-code { color: var(--gem-gold); letter-spacing: 0.2em; }
+.room-hint { color: var(--text-muted); font-size: 0.85rem; }
+
+.player-list { list-style: none; width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: var(--gap-sm); }
+.player-entry { display: flex; align-items: center; gap: var(--gap-sm); padding: 8px 12px; background: rgba(255,255,255,0.06); border-radius: var(--radius); }
+.player-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gem-green); flex-shrink: 0; }
+.player-dot.empty { background: var(--text-muted); }
+.player-name { flex: 1; }
+.player-name.muted { color: var(--text-muted); font-style: italic; }
+.ai-badge { font-size: 0.7rem; background: rgba(79,163,209,0.25); color: var(--gem-blue); border-radius: 4px; padding: 1px 6px; text-transform: capitalize; }
+.host-badge { font-size: 0.7rem; background: rgba(245,200,66,0.25); color: var(--gem-gold); border-radius: 4px; padding: 1px 6px; }
+.waiting-msg { color: var(--text-muted); font-style: italic; font-size: 0.9rem; }
+
+/* ─── Turn indicator toast ────────────────────────────────────────────────── */
+.turn-toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gem-gold);
+  color: #1a1000;
+  font-weight: 700;
+  padding: 8px 22px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  z-index: 100;
+  pointer-events: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  animation: toastIn 0.3s ease;
+}
+@keyframes toastIn { from { opacity: 0; top: 0; } to { opacity: 1; top: 16px; } }
+
+/* ─── Game over overlay ────────────────────────────────────────────────────── */
+.game-over-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200;
+}
+.game-over-card {
+  background: var(--bg-panel);
+  border: 2px solid var(--gem-gold);
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  max-width: 420px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.game-over-title { font-size: 2rem; color: var(--gem-gold); }
+.game-over-winners { font-size: 1.1rem; }

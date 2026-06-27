@@ -1,0 +1,157 @@
+/* ─── Card base ────────────────────────────────────────────────────────────── */
+
+.splendor-card {
+  position: relative;
+  border-radius: var(--radius);
+  border: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.splendor-card.interactive {
+  cursor: pointer;
+}
+.splendor-card.interactive:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.55);
+}
+.splendor-card.interactive:hover.tier-1 { border-color: var(--tier1-border); }
+.splendor-card.interactive:hover.tier-2 { border-color: var(--tier2-border); }
+.splendor-card.interactive:hover.tier-3 { border-color: #7080d8; }
+
+.splendor-card.selected { outline: 3px solid var(--gem-gold); outline-offset: 2px; }
+.splendor-card.unaffordable { opacity: 0.55; }
+
+/* ─── Sizes ──────────────────────────────────────────────────────────────── */
+.splendor-card.sz-md { width: 88px; height: 124px; }
+.splendor-card.sz-sm { width: 64px; height: 92px; }
+.splendor-card.sz-xs { width: 46px; height: 66px; }
+
+/* ─── Tier colour themes ───────────────────────────────────────────────────── */
+.splendor-card.tier-1 { background: var(--tier1-bg); color: #2a1e00; }
+.splendor-card.tier-2 { background: var(--tier2-bg); color: #2a1e00; }
+.splendor-card.tier-3 { background: var(--tier3-bg); color: var(--tier3-text); }
+
+/* ─── Card header (VP + bonus) ────────────────────────────────────────────── */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 5px 6px 2px;
+  flex-shrink: 0;
+}
+
+.card-vp {
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1;
+  min-width: 20px;
+}
+.card-vp.zero { opacity: 0; }   /* hide VP=0 */
+
+.card-bonus {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+.card-bonus.white { background: var(--gem-white); }
+.card-bonus.blue  { background: var(--gem-blue); }
+.card-bonus.green { background: var(--gem-green); }
+.card-bonus.red   { background: var(--gem-red); }
+.card-bonus.black { background: var(--gem-black); }
+
+/* ─── Card body (cost pips) ────────────────────────────────────────────────── */
+.card-body {
+  flex: 1;
+}
+
+.card-cost {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  right: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-cost-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.card-cost-pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+.card-cost-pip.white { background: var(--gem-white); }
+.card-cost-pip.blue  { background: var(--gem-blue); }
+.card-cost-pip.green { background: var(--gem-green); }
+.card-cost-pip.red   { background: var(--gem-red); }
+.card-cost-pip.black { background: var(--gem-black); }
+
+.cost-num {
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.tier-3 .cost-num { color: var(--tier3-text); }
+
+/* ─── Deck placeholder ────────────────────────────────────────────────────── */
+.deck-placeholder {
+  border-radius: var(--radius);
+  border: 2px dashed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 4px;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.deck-placeholder.interactive:hover { filter: brightness(1.2); }
+.deck-placeholder.tier-1 { border-color: var(--tier1-border); color: var(--tier1-border); background: rgba(232,223,200,0.08); }
+.deck-placeholder.tier-2 { border-color: var(--tier2-border); color: var(--tier2-border); background: rgba(247,224,122,0.08); }
+.deck-placeholder.tier-3 { border-color: #4a5a9e; color: #8898d8; background: rgba(42,58,110,0.3); }
+.deck-placeholder.sz-md  { width: 88px; height: 124px; }
+.deck-placeholder.sz-sm  { width: 64px; height: 92px; }
+
+.deck-count {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+.deck-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* ─── Noble tile ─────────────────────────────────────────────────────────── */
+.noble-tile {
+  background: linear-gradient(135deg, #e8d9b0 0%, #c9b070 100%);
+  border: 2px solid #a07830;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 5px;
+  color: #2a1800;
+  box-shadow: var(--shadow);
+  flex-shrink: 0;
+}
+.noble-tile.sz-md { width: 76px; height: 88px; }
+.noble-tile.sz-sm { width: 56px; height: 66px; }
+.noble-vp { font-size: 1.1rem; font-weight: 800; }
+.noble-req { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; }
