@@ -23,6 +23,11 @@ import type { GemColor, GemColorOrGold, GemPool, Card, CardTier } from '@splendo
 // ─── Bootstrap ────────────────────────────────────────────────────────────────
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
+let fullscreenToggleBtn: HTMLButtonElement | null = null;
+
+document.addEventListener('fullscreenchange', () => {
+  updateFullscreenToggleLabel();
+});
 
 connect();
 
@@ -57,6 +62,8 @@ onMessage((msg) => {
 
 function render(state: AppState): void {
   if (state.screen === 'lobby') {
+    removeFullscreenToggle();
+    void exitFullscreenIfNeeded();
     lastTurnToastKey = null;
     app.innerHTML = '';
     app.className = '';
@@ -68,6 +75,7 @@ function render(state: AppState): void {
   }
 
   if (state.screen === 'game' && state.game) {
+    ensureFullscreenToggle();
     renderGameScreen(state);
   }
 }
@@ -229,6 +237,13 @@ function renderGameScreen(state: AppState): void {
     const isTurn = game.players.indexOf(opp) === game.currentPlayerIndex;
     opponentsBar.appendChild(renderOpponentStrip(opp, isTurn));
   }
+  const fsBtn = document.createElement('button');
+  fsBtn.type = 'button';
+  fsBtn.className = 'btn btn-secondary fullscreen-toggle-btn';
+  fsBtn.textContent = document.fullscreenElement ? 'Exit ⛶' : 'Full ⛶';
+  fsBtn.addEventListener('click', () => { void toggleFullscreen(); });
+  fullscreenToggleBtn = fsBtn;
+  opponentsBar.appendChild(fsBtn);
   layout.appendChild(opponentsBar);
 
   // ── Centre: board + bank ──
@@ -275,13 +290,6 @@ function renderGameScreen(state: AppState): void {
   // ── My panel bar ──
   const myPanelBar = document.createElement('div');
   myPanelBar.className = `my-panel-bar${isMyTurn ? ' my-turn' : ''}`;
-
-  if (isMyTurn) {
-    const turnLabel = document.createElement('div');
-    turnLabel.className = 'my-turn-label';
-    turnLabel.textContent = 'Your Turn';
-    myPanelBar.appendChild(turnLabel);
-  }
 
   const myPanelEl = document.createElement('div');
   if (myPlayer) {
@@ -342,5 +350,42 @@ function showToast(msg: string, type: 'error' | 'info' = 'info'): void {
   toast.textContent = msg;
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
+}
+
+// ─── Fullscreen helpers ──────────────────────────────────────────────────────
+
+function ensureFullscreenToggle(): void {
+  // Button is built inline inside renderGameScreen's opponents bar.
+}
+
+function removeFullscreenToggle(): void {
+  fullscreenToggleBtn = null;
+}
+
+function updateFullscreenToggleLabel(): void {
+  if (!fullscreenToggleBtn) return;
+  fullscreenToggleBtn.textContent = document.fullscreenElement ? 'Exit ⛶' : 'Full ⛶';
+}
+
+async function toggleFullscreen(): Promise<void> {
+  if (document.fullscreenElement) {
+    await exitFullscreenIfNeeded();
+    return;
+  }
+
+  try {
+    await document.documentElement.requestFullscreen();
+  } catch (err) {
+    console.warn('[fullscreen] request failed', err);
+  }
+}
+
+async function exitFullscreenIfNeeded(): Promise<void> {
+  if (!document.fullscreenElement) return;
+  try {
+    await document.exitFullscreen();
+  } catch (err) {
+    console.warn('[fullscreen] exit failed', err);
+  }
 }
 

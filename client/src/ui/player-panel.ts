@@ -85,15 +85,17 @@ export function renderMyPanel(
   container.innerHTML = '';
   container.className = 'my-panel';
 
-  if (cb.isMyTurn) {
-    const label = document.createElement('div');
-    label.className = 'my-turn-label';
-    label.textContent = 'Your Turn';
-    container.before(label); // inject above the panel bar
-  }
+  const turnSection = document.createElement('div');
+  turnSection.className = 'my-panel-section my-turn-section';
+  const turnLabel = document.createElement('div');
+  turnLabel.className = `my-turn-label${cb.isMyTurn ? '' : ' is-waiting'}`;
+  turnLabel.textContent = cb.isMyTurn ? 'Your Turn' : 'Waiting';
+  turnSection.appendChild(turnLabel);
+  container.appendChild(turnSection);
 
   // ── Points ──
   const pointsSection = makeSection('Points');
+  pointsSection.classList.add('points-section');
   const pts = document.createElement('div');
   pts.className = 'my-points-badge';
   pts.textContent = String(player.points);
@@ -102,6 +104,7 @@ export function renderMyPanel(
 
   // ── Gems ──
   const gemSection = makeSection('Gems');
+  gemSection.classList.add('gems-section');
   const gemsGrid = document.createElement('div');
   gemsGrid.className = 'my-gems-grid';
   const allColors: (GemColor | 'gold')[] = [...GEM_COLORS, 'gold'];
@@ -121,6 +124,7 @@ export function renderMyPanel(
 
   // ── Bonuses ──
   const bonusSection = makeSection('Bonuses');
+  bonusSection.classList.add('bonuses-section');
   const bonusRow = document.createElement('div');
   bonusRow.className = 'my-bonuses-row';
   for (const color of GEM_COLORS) {
