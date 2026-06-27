@@ -2,13 +2,16 @@
 
 .opponent-strip {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: var(--gap-sm);
   background: rgba(255,255,255,0.05);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius);
   padding: 6px 10px;
-  min-width: 180px;
+  min-height: 46px;
+  width: max-content;
+  min-width: max-content;
   flex-shrink: 0;
   transition: border-color 0.3s;
 }
@@ -16,29 +19,44 @@
   border-color: var(--gem-gold);
   box-shadow: 0 0 0 1px var(--gem-gold);
 }
+.opponent-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  min-width: 0;
+  flex-shrink: 0;
+}
+.opponent-details {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  min-width: max-content;
+  flex-shrink: 0;
+}
 .opponent-strip .player-name {
   font-size: 0.82rem;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 90px;
+  max-width: 108px;
 }
 .opponent-strip .player-pts {
   font-size: 1.1rem;
   font-weight: 800;
   color: var(--gem-gold);
   margin-left: auto;
+  flex-shrink: 0;
 }
-.opponent-strip .mini-gems { display: flex; gap: 3px; flex-wrap: wrap; max-width: 80px; }
-.opponent-strip .mini-bonuses { display: flex; gap: 3px; flex-wrap: wrap; }
+.opponent-strip .mini-gems { display: flex; gap: 3px; flex-wrap: nowrap; flex-shrink: 0; }
+.opponent-strip .mini-bonuses { display: flex; gap: 3px; flex-wrap: nowrap; flex-shrink: 0; }
 .mini-bonus { font-size: 0.65rem; font-weight: 700; padding: 1px 4px; border-radius: 3px; }
 .mini-bonus.white { background: var(--gem-white); color: #333; }
 .mini-bonus.blue  { background: var(--gem-blue); }
 .mini-bonus.green { background: var(--gem-green); }
 .mini-bonus.red   { background: var(--gem-red); }
 .mini-bonus.black { background: var(--gem-black); }
-.reserved-badge { font-size: 0.68rem; background: rgba(255,255,255,0.1); padding: 1px 6px; border-radius: 4px; color: var(--text-muted); }
+.reserved-badge { font-size: 0.68rem; background: rgba(255,255,255,0.1); padding: 1px 6px; border-radius: 4px; color: var(--text-muted); flex-shrink: 0; }
 
 /* ─── My panel ────────────────────────────────────────────────────────────── */
 
