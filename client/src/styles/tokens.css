@@ -7,7 +7,7 @@
   border-radius: 50%;
   font-weight: 700;
   color: #fff;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.65);
   border: 2px solid rgba(255,255,255,0.35);
   box-shadow: inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 6px rgba(0,0,0,0.3);
   flex-shrink: 0;
@@ -26,32 +26,32 @@
 /* Occupation scenes */
 .gem-token.white {
   background-image:
-    linear-gradient(rgba(255,255,255,0.08), rgba(62,40,18,0.12)),
+    linear-gradient(rgba(255,255,255,0.03), rgba(62,40,18,0.06)),
     url('/images/tokens/hawker-white.png');
 }
 .gem-token.blue {
   background-image:
-    linear-gradient(rgba(255,255,255,0.08), rgba(0,0,0,0.18)),
+    linear-gradient(rgba(255,255,255,0.03), rgba(0,0,0,0.08)),
     url('/images/tokens/fisherman-blue.png');
 }
 .gem-token.green {
   background-image:
-    linear-gradient(rgba(255,255,255,0.08), rgba(0,0,0,0.16)),
+    linear-gradient(rgba(255,255,255,0.03), rgba(0,0,0,0.07)),
     url('/images/tokens/farmer-green.png');
 }
 .gem-token.red {
   background-image:
-    linear-gradient(rgba(255,255,255,0.06), rgba(60,0,0,0.14)),
+    linear-gradient(rgba(255,255,255,0.02), rgba(60,0,0,0.08)),
     url('/images/tokens/rubber-red.png');
 }
 .gem-token.black {
   background-image:
-    linear-gradient(rgba(255,255,255,0.06), rgba(0,0,0,0.2)),
+    linear-gradient(rgba(255,255,255,0.02), rgba(0,0,0,0.1)),
     url('/images/tokens/tin-mining-black.png');
 }
 .gem-token.gold {
   background-image:
-    linear-gradient(rgba(255,255,255,0.06), rgba(56,36,0,0.12)),
+    linear-gradient(rgba(255,255,255,0.02), rgba(56,36,0,0.06)),
     url('/images/tokens/kopitiam-gold.png');
   color: #fff7d2;
 }
