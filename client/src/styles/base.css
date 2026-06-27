@@ -235,3 +235,16 @@ h1, h2, h3 { font-weight: 700; letter-spacing: 0.02em; }
 }
 .game-over-title { font-size: 2rem; color: var(--gem-gold); }
 .game-over-winners { font-size: 1.1rem; }
+
+/* ─── In-game fullscreen toggle ───────────────────────────────────────────── */
+.fullscreen-toggle-btn {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 140;
+  padding: 7px 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border-radius: 999px;
+  backdrop-filter: blur(2px);
+}

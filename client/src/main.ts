@@ -23,6 +23,11 @@ import type { GemColor, GemColorOrGold, GemPool, Card, CardTier } from '@splendo
 // ─── Bootstrap ────────────────────────────────────────────────────────────────
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
+let fullscreenToggleBtn: HTMLButtonElement | null = null;
+
+document.addEventListener('fullscreenchange', () => {
+  updateFullscreenToggleLabel();
+});
 
 connect();
 
@@ -57,6 +62,8 @@ onMessage((msg) => {
 
 function render(state: AppState): void {
   if (state.screen === 'lobby') {
+    removeFullscreenToggle();
+    void exitFullscreenIfNeeded();
     lastTurnToastKey = null;
     app.innerHTML = '';
     app.className = '';
@@ -68,6 +75,7 @@ function render(state: AppState): void {
   }
 
   if (state.screen === 'game' && state.game) {
+    ensureFullscreenToggle();
     renderGameScreen(state);
   }
 }
@@ -342,5 +350,58 @@ function showToast(msg: string, type: 'error' | 'info' = 'info'): void {
   toast.textContent = msg;
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
+}
+
+// ─── Fullscreen helpers ──────────────────────────────────────────────────────
+
+function ensureFullscreenToggle(): void {
+  if (fullscreenToggleBtn) {
+    updateFullscreenToggleLabel();
+    return;
+  }
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'btn btn-secondary fullscreen-toggle-btn';
+  btn.addEventListener('click', () => {
+    void toggleFullscreen();
+  });
+
+  fullscreenToggleBtn = btn;
+  document.body.appendChild(btn);
+  updateFullscreenToggleLabel();
+}
+
+function removeFullscreenToggle(): void {
+  if (!fullscreenToggleBtn) return;
+  fullscreenToggleBtn.remove();
+  fullscreenToggleBtn = null;
+}
+
+function updateFullscreenToggleLabel(): void {
+  if (!fullscreenToggleBtn) return;
+  fullscreenToggleBtn.textContent = document.fullscreenElement ? 'Exit Fullscreen' : 'Enter Fullscreen';
+}
+
+async function toggleFullscreen(): Promise<void> {
+  if (document.fullscreenElement) {
+    await exitFullscreenIfNeeded();
+    return;
+  }
+
+  try {
+    await document.documentElement.requestFullscreen();
+  } catch (err) {
+    console.warn('[fullscreen] request failed', err);
+  }
+}
+
+async function exitFullscreenIfNeeded(): Promise<void> {
+  if (!document.fullscreenElement) return;
+  try {
+    await document.exitFullscreen();
+  } catch (err) {
+    console.warn('[fullscreen] exit failed', err);
+  }
 }
 
