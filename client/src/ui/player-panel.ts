@@ -158,7 +158,7 @@ export function renderMyPanel(
     const row = document.createElement('div');
     row.className = 'my-nobles-row';
     for (const noble of player.nobles) {
-      row.appendChild(renderNobleTile(noble, 'sz-sm'));
+      row.appendChild(renderNobleTile(noble, 'sz-sm', { showRequirementNumbers: false }));
     }
     nobSection.appendChild(row);
     container.appendChild(nobSection);

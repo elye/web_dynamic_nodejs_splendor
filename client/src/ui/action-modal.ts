@@ -1,6 +1,6 @@
-import type { Card, GemColor, GemColorOrGold, CardTier, GemPool, PlayerState } from '@splendor/shared';
+import type { Card, Noble, GemColor, GemColorOrGold, CardTier, GemPool, PlayerState } from '@splendor/shared';
 import { GEM_COLORS } from '@splendor/shared';
-import { renderCard, renderGemToken } from './card.js';
+import { renderCard, renderGemToken, renderNobleTile } from './card.js';
 import { send } from '../ws-client.js';
 
 // ─── Modal host ───────────────────────────────────────────────────────────────
@@ -16,6 +16,9 @@ function openModal(content: HTMLElement): void {
   });
   const box = document.createElement('div');
   box.className = 'modal-box';
+  if (content.classList.contains('discard-modal')) {
+    box.classList.add('modal-box-discard');
+  }
   box.appendChild(content);
   modalOverlay.appendChild(box);
   document.body.appendChild(modalOverlay);
@@ -292,6 +295,40 @@ export function openDiscardModal(excess: number, myGems: GemPool): void {
   openModal(element);
 }
 
+// ─── Noble choice modal ──────────────────────────────────────────────────────
+
+export function openNobleChoiceModal(nobles: Noble[]): void {
+  const frag = document.createElement('div');
+  frag.className = 'noble-choice-modal';
+
+  const title = document.createElement('h3');
+  title.textContent = 'Choose a Noble';
+  frag.appendChild(title);
+
+  const hint = document.createElement('p');
+  hint.className = 'picker-hint';
+  hint.textContent = 'You qualify for multiple nobles this turn. Pick one to claim.';
+  frag.appendChild(hint);
+
+  const row = document.createElement('div');
+  row.className = 'noble-choice-row';
+  for (const noble of nobles) {
+    const btn = document.createElement('button');
+    btn.className = 'noble-choice-btn';
+    btn.type = 'button';
+    btn.title = 'Choose this noble';
+    btn.appendChild(renderNobleTile(noble, 'sz-sm', { showRequirementNumbers: false }));
+    btn.addEventListener('click', () => {
+      send({ type: 'CHOOSE_NOBLE', nobleId: noble.id });
+      closeModal();
+    });
+    row.appendChild(btn);
+  }
+  frag.appendChild(row);
+
+  openModal(frag);
+}
+
 function renderDiscardPicker(
   container: HTMLElement,
   excess: number,
@@ -385,6 +422,9 @@ const modalStyles = `
   width: 90%;
   display: flex; flex-direction: column; gap: 16px;
 }
+.modal-box.modal-box-discard {
+  max-width: 520px;
+}
 .modal-box h3 { color: var(--gem-gold); font-size: 1.2rem; }
 .modal-box p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
 .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
@@ -395,7 +435,10 @@ const modalStyles = `
 .picker-info { font-size: 0.72rem; color: var(--text-muted); }
 .gem-picker-modal { display: flex; flex-direction: column; gap: 16px; align-items: center; }
 .discard-modal { align-items: stretch; width: 100%; }
-.discard-modal .picker-grid { justify-content: space-evenly; }
+.discard-modal .picker-grid {
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
 .discard-modal .discard-picker-col {
   flex-direction: row;
   min-width: 64px;
@@ -410,6 +453,19 @@ const modalStyles = `
   visibility: hidden;
 }
 .discard-modal .modal-actions { width: 100%; margin-top: 8px; }
+.noble-choice-modal { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.noble-choice-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.noble-choice-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 10px;
+  padding: 6px;
+  cursor: pointer;
+}
+.noble-choice-btn:hover {
+  border-color: var(--gem-gold);
+  transform: translateY(-1px);
+}
 `;
 
 const styleEl = document.createElement('style');
