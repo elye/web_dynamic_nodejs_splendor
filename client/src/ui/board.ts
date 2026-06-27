@@ -10,6 +10,13 @@ export interface BoardCallbacks {
   isMyTurn: boolean;
 }
 
+export interface BankCallbacks {
+  onGemClick: (color: GemColorOrGold) => void;
+  onConfirmTakeGems: () => void;
+  onClearGemSelection: () => void;
+  isMyTurn: boolean;
+}
+
 // ─── Main board renderer ──────────────────────────────────────────────────────
 
 export function renderBoard(container: HTMLElement, state: GameState, cb: BoardCallbacks): void {
@@ -68,8 +75,9 @@ export function renderBoard(container: HTMLElement, state: GameState, cb: BoardC
 export function renderBankPanel(
   container: HTMLElement,
   state: GameState,
-  cb: BoardCallbacks,
+  cb: BankCallbacks,
   selectedGems: Map<GemColorOrGold, number>,
+  selectionHint: string,
 ): void {
   container.innerHTML = '';
   container.className = 'bank-panel';
@@ -86,7 +94,8 @@ export function renderBankPanel(
 
   for (const color of allColors) {
     const count = state.bank[color] ?? 0;
-    const isSelected = (selectedGems.get(color) ?? 0) > 0;
+    const selectedCount = selectedGems.get(color) ?? 0;
+    const isSelected = selectedCount > 0;
 
     const row = document.createElement('div');
     row.className = 'bank-gem-row';
@@ -99,6 +108,13 @@ export function renderBankPanel(
     });
     row.appendChild(token);
 
+    if (selectedCount > 1) {
+      const multi = document.createElement('span');
+      multi.className = 'bank-gem-multi';
+      multi.textContent = `x${selectedCount}`;
+      row.appendChild(multi);
+    }
+
     if (color === 'gold') {
       const label = document.createElement('span');
       label.className = 'bank-gem-label';
@@ -110,6 +126,30 @@ export function renderBankPanel(
   }
 
   container.appendChild(gemsCol);
+
+  const hint = document.createElement('div');
+  hint.className = 'bank-selection-hint';
+  hint.textContent = selectionHint;
+  container.appendChild(hint);
+
+  const actions = document.createElement('div');
+  actions.className = 'bank-actions';
+
+  const confirmBtn = document.createElement('button');
+  confirmBtn.className = 'btn btn-primary btn-sm';
+  confirmBtn.textContent = 'Take Selected';
+  confirmBtn.disabled = !cb.isMyTurn || selectedGems.size === 0;
+  confirmBtn.addEventListener('click', cb.onConfirmTakeGems);
+  actions.appendChild(confirmBtn);
+
+  const clearBtn = document.createElement('button');
+  clearBtn.className = 'btn btn-secondary btn-sm';
+  clearBtn.textContent = 'Clear';
+  clearBtn.disabled = selectedGems.size === 0;
+  clearBtn.addEventListener('click', cb.onClearGemSelection);
+  actions.appendChild(clearBtn);
+
+  container.appendChild(actions);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
