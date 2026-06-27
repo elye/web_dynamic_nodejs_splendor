@@ -11,11 +11,25 @@ export function renderOpponentStrip(
   const el = document.createElement('div');
   el.className = `opponent-strip${isCurrentTurn ? ' active-turn' : ''}`;
 
+  const summary = document.createElement('div');
+  summary.className = 'opponent-summary';
+
   // Name
   const name = document.createElement('div');
   name.className = 'player-name';
   name.textContent = player.name;
-  el.appendChild(name);
+  summary.appendChild(name);
+
+  // Points
+  const pts = document.createElement('div');
+  pts.className = 'player-pts';
+  pts.textContent = String(player.points);
+  summary.appendChild(pts);
+
+  el.appendChild(summary);
+
+  const details = document.createElement('div');
+  details.className = 'opponent-details';
 
   // Gem tokens (compact)
   const gemsEl = document.createElement('div');
@@ -27,7 +41,7 @@ export function renderOpponentStrip(
     const token = renderGemToken(color, count, 'sz-sm');
     gemsEl.appendChild(token);
   }
-  el.appendChild(gemsEl);
+  details.appendChild(gemsEl);
 
   // Bonuses
   const bonusEl = document.createElement('div');
@@ -40,21 +54,17 @@ export function renderOpponentStrip(
     chip.textContent = String(n);
     bonusEl.appendChild(chip);
   }
-  el.appendChild(bonusEl);
+  details.appendChild(bonusEl);
 
   // Reserved count
   if (player.reservedCards.length > 0) {
     const badge = document.createElement('span');
     badge.className = 'reserved-badge';
     badge.textContent = `✦${player.reservedCards.length}`;
-    el.appendChild(badge);
+    details.appendChild(badge);
   }
 
-  // Points
-  const pts = document.createElement('div');
-  pts.className = 'player-pts';
-  pts.textContent = String(player.points);
-  el.appendChild(pts);
+  el.appendChild(details);
 
   return el;
 }

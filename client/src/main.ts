@@ -118,7 +118,7 @@ function toggleBankGemSelection(color: GemColorOrGold, bank: GemPool): void {
     return;
   }
 
-  selectedGems.delete(color);
+  selectedGems.set(color, 1);
 }
 
 function sanitizeBankSelection(bank: GemPool): void {

@@ -287,6 +287,7 @@ export function openDiscardModal(excess: number, myGems: GemPool): void {
   }
 
   element = document.createElement('div');
+  element.className = 'gem-picker-modal discard-modal';
   rebuild();
   openModal(element);
 }
@@ -314,30 +315,34 @@ function renderDiscardPicker(
     const sel = selected.get(color) ?? 0;
 
     const col = document.createElement('div');
-    col.className = 'picker-col';
+    col.className = 'picker-col discard-picker-col';
 
     const token = renderGemToken(color, have, 'sz-md', {
-      clickable: sel < have && totalSelected < excess,
+      clickable: sel > 0 || (sel < have && totalSelected < excess),
       selected: sel > 0,
       onClick: () => {
         const cur = selected.get(color) ?? 0;
         const tot = [...selected.values()].reduce((a, b) => a + b, 0);
-        if (tot < excess) {
+
+        if (cur > 0) {
+          if (cur === 1) {
+            selected.delete(color);
+          } else {
+            selected.set(color, cur - 1);
+          }
+        } else if (tot < excess) {
           selected.set(color, cur + 1);
-        } else {
-          selected.delete(color);
         }
+
         onChange();
       },
     });
     col.appendChild(token);
 
-    if (sel > 0) {
-      const badge = document.createElement('div');
-      badge.className = 'picker-info';
-      badge.textContent = `−${sel}`;
-      col.appendChild(badge);
-    }
+    const badge = document.createElement('div');
+    badge.className = `picker-info discard-badge${sel > 0 ? '' : ' is-empty'}`;
+    badge.textContent = sel > 0 ? `−${sel}` : '−0';
+    col.appendChild(badge);
 
     grid.appendChild(col);
   }
@@ -389,6 +394,22 @@ const modalStyles = `
 .picker-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .picker-info { font-size: 0.72rem; color: var(--text-muted); }
 .gem-picker-modal { display: flex; flex-direction: column; gap: 16px; align-items: center; }
+.discard-modal { align-items: stretch; width: 100%; }
+.discard-modal .picker-grid { justify-content: space-evenly; }
+.discard-modal .discard-picker-col {
+  flex-direction: row;
+  min-width: 64px;
+  justify-content: center;
+}
+.discard-modal .discard-badge {
+  min-width: 28px;
+  text-align: left;
+  font-weight: 700;
+}
+.discard-modal .discard-badge.is-empty {
+  visibility: hidden;
+}
+.discard-modal .modal-actions { width: 100%; margin-top: 8px; }
 `;
 
 const styleEl = document.createElement('style');
