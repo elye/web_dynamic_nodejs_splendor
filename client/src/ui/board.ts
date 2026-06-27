@@ -35,7 +35,7 @@ export function renderBoard(container: HTMLElement, state: GameState, cb: BoardC
   for (const tierNum of [3, 2, 1] as CardTier[]) {
     const tierState = state.tiers[tierNum - 1];
     const row = document.createElement('div');
-    row.className = 'tier-row';
+    row.className = `tier-row tier-row-${tierNum}`;
 
     // Deck
     const deckEl = renderDeckPlaceholder(

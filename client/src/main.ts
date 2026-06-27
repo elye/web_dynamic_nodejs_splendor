@@ -284,13 +284,6 @@ function renderGameScreen(state: AppState): void {
   const myPanelBar = document.createElement('div');
   myPanelBar.className = `my-panel-bar${isMyTurn ? ' my-turn' : ''}`;
 
-  if (isMyTurn) {
-    const turnLabel = document.createElement('div');
-    turnLabel.className = 'my-turn-label';
-    turnLabel.textContent = 'Your Turn';
-    myPanelBar.appendChild(turnLabel);
-  }
-
   const myPanelEl = document.createElement('div');
   if (myPlayer) {
     renderMyPanel(myPanelEl, myPlayer, {

@@ -75,6 +75,10 @@
   flex-shrink: 0;
 }
 
+.my-turn-section {
+  justify-content: center;
+}
+
 .section-label {
   font-size: 0.68rem;
   text-transform: uppercase;
@@ -143,10 +147,123 @@
 }
 
 .my-turn-label {
-  font-size: 0.72rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.94rem;
+  font-weight: 800;
   color: var(--gem-gold);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-bottom: 2px;
+  margin-bottom: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 200, 66, 0.5);
+  background: rgba(245, 200, 66, 0.12);
+}
+
+@media (orientation: landscape) and (min-width: 900px) {
+  .opponent-strip {
+    min-height: 57px;
+    padding: 6px 10px;
+    gap: 6px;
+  }
+
+  .opponent-strip .player-name {
+    font-size: 1.12rem;
+    max-width: 135px;
+  }
+
+  .opponent-strip .player-pts {
+    font-size: 1.42rem;
+  }
+
+  .opponent-strip .gem-token.sz-sm {
+    width: 33px;
+    height: 33px;
+    font-size: 0.95rem;
+  }
+
+  .opponent-strip .mini-bonus {
+    font-size: 0.98rem;
+    padding: 2px 6px;
+    border-radius: 5px;
+  }
+
+  .opponent-strip .reserved-badge {
+    font-size: 1rem;
+    padding: 2px 8px;
+  }
+
+  .my-panel {
+    gap: 21px;
+    padding-bottom: 3px;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .my-panel-section {
+    gap: 8px;
+  }
+
+  .my-panel-section.points-section,
+  .my-panel-section.gems-section,
+  .my-panel-section.bonuses-section,
+  .my-panel-section.my-turn-section {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label {
+    font-size: 1.2rem;
+    letter-spacing: 0.06em;
+  }
+
+  .my-points-badge {
+    font-size: 2.25rem;
+  }
+
+  .my-turn-label {
+    font-size: 1.38rem;
+    padding: 9px 18px;
+  }
+
+  .my-gems-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .my-gem-slot {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .my-panel .gem-token.sz-sm {
+    width: 42px;
+    height: 42px;
+    font-size: 1.2rem;
+  }
+
+  .my-gem-count {
+    font-size: 1.26rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    min-width: 15px;
+  }
+
+  .my-bonuses-row {
+    flex-wrap: nowrap;
+    gap: 9px;
+    align-items: center;
+  }
+
+  .my-bonus-chip {
+    font-size: 1.29rem;
+    padding: 6px 14px;
+    border-radius: 9px;
+  }
 }
