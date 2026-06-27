@@ -79,6 +79,8 @@ export function renderBankPanel(
   selectedGems: Map<GemColorOrGold, number>,
   selectionHint: string,
 ): void {
+  const isPortrait = window.matchMedia('(orientation: portrait)').matches;
+
   container.innerHTML = '';
   container.className = 'bank-panel';
 
@@ -87,50 +89,37 @@ export function renderBankPanel(
   title.textContent = 'Gem Bank';
   container.appendChild(title);
 
-  const gemsCol = document.createElement('div');
-  gemsCol.className = 'bank-gems';
+  const primaryRow = document.createElement('div');
+  primaryRow.className = 'bank-row bank-row-primary';
 
-  const allColors: GemColorOrGold[] = [...GEM_COLORS, 'gold'];
+  const selectGems = document.createElement('div');
+  selectGems.className = 'bank-select-gems';
 
-  for (const color of allColors) {
+  for (const color of GEM_COLORS) {
     const count = state.bank[color] ?? 0;
     const selectedCount = selectedGems.get(color) ?? 0;
     const isSelected = selectedCount > 0;
 
-    const row = document.createElement('div');
-    row.className = 'bank-gem-row';
+    const item = document.createElement('div');
+    item.className = 'bank-gem-item';
 
     const token = renderGemToken(color, count, 'sz-md', {
-      clickable: cb.isMyTurn && color !== 'gold' && count > 0,
+      clickable: cb.isMyTurn && count > 0,
       selected: isSelected,
       disabled: count === 0,
       onClick: () => cb.onGemClick(color),
     });
-    row.appendChild(token);
+    item.appendChild(token);
 
-    if (selectedCount > 1) {
-      const multi = document.createElement('span');
-      multi.className = 'bank-gem-multi';
-      multi.textContent = `x${selectedCount}`;
-      row.appendChild(multi);
-    }
+    const multi = document.createElement('span');
+    multi.className = `bank-gem-multi${selectedCount > 0 ? '' : ' is-empty'}`;
+    multi.textContent = selectedCount > 0 ? `x${selectedCount}` : 'x0';
+    item.appendChild(multi);
 
-    if (color === 'gold') {
-      const label = document.createElement('span');
-      label.className = 'bank-gem-label';
-      label.textContent = 'Reserve';
-      row.appendChild(label);
-    }
-
-    gemsCol.appendChild(row);
+    selectGems.appendChild(item);
   }
 
-  container.appendChild(gemsCol);
-
-  const hint = document.createElement('div');
-  hint.className = 'bank-selection-hint';
-  hint.textContent = selectionHint;
-  container.appendChild(hint);
+  primaryRow.appendChild(selectGems);
 
   const actions = document.createElement('div');
   actions.className = 'bank-actions';
@@ -149,7 +138,41 @@ export function renderBankPanel(
   clearBtn.addEventListener('click', cb.onClearGemSelection);
   actions.appendChild(clearBtn);
 
-  container.appendChild(actions);
+  primaryRow.appendChild(actions);
+  container.appendChild(primaryRow);
+
+  const secondaryRow = document.createElement('div');
+  secondaryRow.className = 'bank-row bank-row-secondary';
+
+  const reserveInfo = document.createElement('div');
+  reserveInfo.className = 'bank-reserve-info';
+  const goldCount = state.bank.gold ?? 0;
+  reserveInfo.appendChild(
+    renderGemToken('gold', goldCount, 'sz-md', {
+      clickable: false,
+      selected: false,
+      disabled: goldCount === 0,
+    }),
+  );
+  const reserveLabel = document.createElement('span');
+  reserveLabel.className = 'bank-gem-label';
+  reserveLabel.textContent = 'Reserve';
+  reserveInfo.appendChild(reserveLabel);
+
+  if (isPortrait) {
+    primaryRow.appendChild(reserveInfo);
+    secondaryRow.appendChild(actions);
+  } else {
+    secondaryRow.appendChild(reserveInfo);
+    secondaryRow.appendChild(actions);
+  }
+
+  const hint = document.createElement('div');
+  hint.className = 'bank-selection-hint';
+  hint.textContent = selectionHint;
+  secondaryRow.appendChild(hint);
+
+  container.appendChild(secondaryRow);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

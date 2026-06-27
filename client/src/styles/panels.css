@@ -8,8 +8,8 @@
   background: rgba(255,255,255,0.05);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius);
-  padding: 6px 10px;
-  min-height: 46px;
+  padding: 8px 12px;
+  min-height: 58px;
   width: max-content;
   min-width: max-content;
   flex-shrink: 0;
@@ -34,7 +34,7 @@
   flex-shrink: 0;
 }
 .opponent-strip .player-name {
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -42,7 +42,7 @@
   max-width: 108px;
 }
 .opponent-strip .player-pts {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   font-weight: 800;
   color: var(--gem-gold);
   margin-left: auto;
@@ -50,7 +50,8 @@
 }
 .opponent-strip .mini-gems { display: flex; gap: 3px; flex-wrap: nowrap; flex-shrink: 0; }
 .opponent-strip .mini-bonuses { display: flex; gap: 3px; flex-wrap: nowrap; flex-shrink: 0; }
-.mini-bonus { font-size: 0.65rem; font-weight: 700; padding: 1px 4px; border-radius: 3px; }
+.opponent-strip .gem-token.sz-sm { width: 26px; height: 26px; font-size: 0.74rem; }
+.mini-bonus { font-size: 0.8rem; font-weight: 800; padding: 3px 7px; border-radius: 5px; }
 .mini-bonus.white { background: var(--gem-white); color: #333; }
 .mini-bonus.blue  { background: var(--gem-blue); }
 .mini-bonus.green { background: var(--gem-green); }
@@ -80,7 +81,7 @@
 }
 
 .section-label {
-  font-size: 0.68rem;
+  font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--text-muted);
@@ -100,7 +101,7 @@
 }
 
 .my-gem-count {
-  font-size: 0.68rem;
+  font-size: 0.84rem;
   font-weight: 700;
   color: var(--text-muted);
 }
@@ -112,10 +113,10 @@
 }
 
 .my-bonus-chip {
-  font-size: 0.72rem;
+  font-size: 1.02rem;
   font-weight: 800;
-  padding: 2px 7px;
-  border-radius: 4px;
+  padding: 5px 12px;
+  border-radius: 6px;
 }
 .my-bonus-chip.white { background: var(--gem-white); color: #333; }
 .my-bonus-chip.blue  { background: var(--gem-blue); }
@@ -129,7 +130,7 @@
 }
 
 .my-points-badge {
-  font-size: 1.5rem;
+  font-size: 1.9rem;
   font-weight: 800;
   color: var(--gem-gold);
   line-height: 1;
@@ -143,23 +144,40 @@
 /* Turn highlight */
 .my-panel-bar.my-turn {
   border-top-color: var(--gem-gold);
-  background: rgba(245,200,66,0.07);
+  background: linear-gradient(180deg, rgba(22, 78, 30, 0.95), rgba(16, 58, 22, 0.95));
+}
+
+.my-panel-bar {
+  background: linear-gradient(180deg, rgba(22, 78, 30, 0.95), rgba(16, 58, 22, 0.95));
 }
 
 .my-turn-label {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.94rem;
+  min-width: 10.5rem;
+  font-size: 1.08rem;
   font-weight: 800;
   color: var(--gem-gold);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 0;
-  padding: 6px 12px;
+  padding: 8px 14px;
   border-radius: 999px;
   border: 1px solid rgba(245, 200, 66, 0.5);
   background: rgba(245, 200, 66, 0.12);
+}
+
+.my-turn-label.is-waiting {
+  color: var(--text-muted);
+  border-color: rgba(255, 255, 255, 0.38);
+  background: rgba(22, 78, 30, 0.4);
+}
+
+.my-panel .gem-token.sz-sm {
+  width: 30px;
+  height: 30px;
+  font-size: 0.86rem;
 }
 
 @media (orientation: landscape) and (min-width: 900px) {

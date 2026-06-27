@@ -237,6 +237,13 @@ function renderGameScreen(state: AppState): void {
     const isTurn = game.players.indexOf(opp) === game.currentPlayerIndex;
     opponentsBar.appendChild(renderOpponentStrip(opp, isTurn));
   }
+  const fsBtn = document.createElement('button');
+  fsBtn.type = 'button';
+  fsBtn.className = 'btn btn-secondary fullscreen-toggle-btn';
+  fsBtn.textContent = document.fullscreenElement ? 'Exit ⛶' : 'Full ⛶';
+  fsBtn.addEventListener('click', () => { void toggleFullscreen(); });
+  fullscreenToggleBtn = fsBtn;
+  opponentsBar.appendChild(fsBtn);
   layout.appendChild(opponentsBar);
 
   // ── Centre: board + bank ──
@@ -348,32 +355,16 @@ function showToast(msg: string, type: 'error' | 'info' = 'info'): void {
 // ─── Fullscreen helpers ──────────────────────────────────────────────────────
 
 function ensureFullscreenToggle(): void {
-  if (fullscreenToggleBtn) {
-    updateFullscreenToggleLabel();
-    return;
-  }
-
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'btn btn-secondary fullscreen-toggle-btn';
-  btn.addEventListener('click', () => {
-    void toggleFullscreen();
-  });
-
-  fullscreenToggleBtn = btn;
-  document.body.appendChild(btn);
-  updateFullscreenToggleLabel();
+  // Button is built inline inside renderGameScreen's opponents bar.
 }
 
 function removeFullscreenToggle(): void {
-  if (!fullscreenToggleBtn) return;
-  fullscreenToggleBtn.remove();
   fullscreenToggleBtn = null;
 }
 
 function updateFullscreenToggleLabel(): void {
   if (!fullscreenToggleBtn) return;
-  fullscreenToggleBtn.textContent = document.fullscreenElement ? 'Exit Fullscreen' : 'Enter Fullscreen';
+  fullscreenToggleBtn.textContent = document.fullscreenElement ? 'Exit ⛶' : 'Full ⛶';
 }
 
 async function toggleFullscreen(): Promise<void> {

@@ -85,15 +85,13 @@ export function renderMyPanel(
   container.innerHTML = '';
   container.className = 'my-panel';
 
-  if (cb.isMyTurn) {
-    const turnSection = document.createElement('div');
-    turnSection.className = 'my-panel-section my-turn-section';
-    const turnLabel = document.createElement('div');
-    turnLabel.className = 'my-turn-label';
-    turnLabel.textContent = 'Your Turn';
-    turnSection.appendChild(turnLabel);
-    container.appendChild(turnSection);
-  }
+  const turnSection = document.createElement('div');
+  turnSection.className = 'my-panel-section my-turn-section';
+  const turnLabel = document.createElement('div');
+  turnLabel.className = `my-turn-label${cb.isMyTurn ? '' : ' is-waiting'}`;
+  turnLabel.textContent = cb.isMyTurn ? 'Your Turn' : 'Waiting';
+  turnSection.appendChild(turnLabel);
+  container.appendChild(turnSection);
 
   // ── Points ──
   const pointsSection = makeSection('Points');
