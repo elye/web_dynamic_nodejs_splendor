@@ -4,7 +4,7 @@ import './styles/cards.css';
 import './styles/board.css';
 import './styles/panels.css';
 
-import { connect, onMessage } from './ws-client.js';
+import { connect, onMessage, send } from './ws-client.js';
 import { setPlayerId, setRoom, setGame, getState, subscribe } from './state.js';
 import type { AppState } from './state.js';
 import { renderLobby } from './ui/lobby.js';
@@ -13,11 +13,11 @@ import { renderOpponentStrip, renderMyPanel } from './ui/player-panel.js';
 import {
   openCardModal,
   openDeckReserveModal,
-  openGemPickerModal,
   openDiscardModal,
   closeModal,
 } from './ui/action-modal.js';
-import type { GemColorOrGold, Card, CardTier } from '@splendor/shared';
+import { GEM_COLORS } from '@splendor/shared';
+import type { GemColor, GemColorOrGold, GemPool, Card, CardTier } from '@splendor/shared';
 
 // ─── Bootstrap ────────────────────────────────────────────────────────────────
 
@@ -49,13 +49,11 @@ onMessage((msg) => {
   }
 });
 
-subscribe(render);
-render(getState());
-
 // ─── Render router ────────────────────────────────────────────────────────────
 
 function render(state: AppState): void {
   if (state.screen === 'lobby') {
+    lastTurnToastKey = null;
     app.innerHTML = '';
     app.className = '';
     const lobbyEl = document.createElement('div');
@@ -74,6 +72,107 @@ function render(state: AppState): void {
 
 // Track selected gems across renders (persists during a turn)
 const selectedGems = new Map<GemColorOrGold, number>();
+let lastTurnToastKey: string | null = null;
+
+subscribe(render);
+render(getState());
+
+function selectedGemTotal(selection: Map<GemColorOrGold, number>): number {
+  return [...selection.values()].reduce((sum, count) => sum + count, 0);
+}
+
+function canAddGemColor(
+  color: GemColor,
+  selection: Map<GemColorOrGold, number>,
+  bank: GemPool,
+): boolean {
+  const total = selectedGemTotal(selection);
+  const bankCount = bank[color] ?? 0;
+
+  if (bankCount === 0) return false;
+  if (selection.size === 1 && total === 2) return false;
+  if (total >= 3) return false;
+
+  return true;
+}
+
+function toggleBankGemSelection(color: GemColorOrGold, bank: GemPool): void {
+  if (color === 'gold') return;
+
+  const current = selectedGems.get(color) ?? 0;
+  const total = selectedGemTotal(selectedGems);
+  const bankCount = bank[color] ?? 0;
+
+  if (current === 0) {
+    if (!canAddGemColor(color, selectedGems, bank)) return;
+    selectedGems.set(color, 1);
+    return;
+  }
+
+  if (current === 1) {
+    if (selectedGems.size === 1 && total === 1 && bankCount >= 4) {
+      selectedGems.set(color, 2);
+    } else {
+      selectedGems.delete(color);
+    }
+    return;
+  }
+
+  selectedGems.delete(color);
+}
+
+function sanitizeBankSelection(bank: GemPool): void {
+  for (const [color, count] of [...selectedGems.entries()]) {
+    if (color === 'gold') {
+      selectedGems.delete(color);
+      continue;
+    }
+
+    const available = bank[color] ?? 0;
+    if (available <= 0) {
+      selectedGems.delete(color);
+      continue;
+    }
+
+    if (count > available) {
+      selectedGems.set(color, available);
+    }
+
+    if ((selectedGems.get(color) ?? 0) > 1 && (available < 4 || selectedGems.size > 1)) {
+      selectedGems.set(color, 1);
+    }
+  }
+}
+
+function bankSelectionHint(selection: Map<GemColorOrGold, number>, bank: GemPool): string {
+  const total = selectedGemTotal(selection);
+  const isDouble = selection.size === 1 && total === 2;
+
+  if (total === 0) return 'Pick up to 3 colours, or double one colour (4+ in bank).';
+  if (isDouble) return 'Double pick ready. Click Take Selected, or click again to remove.';
+  if (total === 3) return 'Max selected. Take now or click a gem to change.';
+
+  const singleColor = [...selection.keys()][0] as GemColorOrGold | undefined;
+  if (singleColor && singleColor !== 'gold') {
+    const canDouble = (bank[singleColor] ?? 0) >= 4;
+    if (total === 1 && canDouble) {
+      return 'Click same gem again for x2, or add different colours.';
+    }
+  }
+
+  return `${3 - total} more colour${total === 2 ? '' : 's'} possible, or Take Selected.`;
+}
+
+function sendTakeSelectedGems(): void {
+  const gems: GemPool = {};
+  for (const color of GEM_COLORS) {
+    const count = selectedGems.get(color) ?? 0;
+    if (count > 0) gems[color] = count;
+  }
+  if (Object.keys(gems).length === 0) return;
+  send({ type: 'TAKE_GEMS', gems });
+  selectedGems.clear();
+}
 
 function renderGameScreen(state: AppState): void {
   const { game, myPlayerId } = state;
@@ -86,6 +185,12 @@ function renderGameScreen(state: AppState): void {
   const myIndex = game.players.findIndex(p => p.id === myPlayerId);
   const isMyTurn = game.phase === 'playing' && game.currentPlayerIndex === myIndex && !game.pendingDiscard;
   const opponents = game.players.filter(p => p.id !== myPlayerId);
+
+  if (!isMyTurn) {
+    selectedGems.clear();
+  } else {
+    sanitizeBankSelection(game.bank);
+  }
 
   // Game over overlay
   if (game.phase === 'finished') {
@@ -137,24 +242,27 @@ function renderGameScreen(state: AppState): void {
       if (!myPlayer) return;
       openDeckReserveModal(tier, myPlayer);
     },
-    onGemClick: (color: GemColorOrGold) => {
-      if (!isMyTurn) return;
-      openGemPickerModal(game.bank, color);
-    },
+    onGemClick: () => {},
   });
   center.appendChild(boardArea);
 
   const bankPanel = document.createElement('div');
   renderBankPanel(bankPanel, game, {
-    myPlayer,
     isMyTurn,
-    onCardClick: () => {},
-    onDeckClick: () => {},
     onGemClick: (color: GemColorOrGold) => {
       if (!isMyTurn) return;
-      openGemPickerModal(game.bank, color);
+      toggleBankGemSelection(color, game.bank);
+      render(getState());
     },
-  }, selectedGems);
+    onConfirmTakeGems: () => {
+      if (!isMyTurn) return;
+      sendTakeSelectedGems();
+    },
+    onClearGemSelection: () => {
+      selectedGems.clear();
+      render(getState());
+    },
+  }, selectedGems, bankSelectionHint(selectedGems, game.bank));
   center.appendChild(bankPanel);
 
   layout.appendChild(center);
@@ -194,9 +302,15 @@ function renderGameScreen(state: AppState): void {
   if (game.phase === 'playing') {
     const current = game.players[game.currentPlayerIndex];
     if (current) {
-      const isMe = current.id === myPlayerId;
-      showTurnToast(isMe ? 'Your turn!' : `${current.name}'s turn`);
+      const toastKey = `${game.roomCode}:${game.phase}:${current.id}`;
+      if (toastKey !== lastTurnToastKey) {
+        const isMe = current.id === myPlayerId;
+        showTurnToast(isMe ? 'Your turn!' : `${current.name}'s turn`);
+        lastTurnToastKey = toastKey;
+      }
     }
+  } else {
+    lastTurnToastKey = null;
   }
 }
 

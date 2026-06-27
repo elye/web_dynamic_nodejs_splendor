@@ -89,13 +89,14 @@
 .bank-gems {
   display: flex;
   flex-direction: column;
-  gap: var(--gap-sm);
+  gap: 8px;
 }
 
 .bank-gem-row {
   display: flex;
   align-items: center;
-  gap: var(--gap-sm);
+  gap: 10px;
+  min-height: 38px;
 }
 
 .bank-gem-label {
@@ -111,4 +112,35 @@
   font-weight: 700;
   min-width: 16px;
   text-align: right;
+}
+
+.bank-selection-hint {
+  width: 220px;
+  height: 60px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  text-align: left;
+  line-height: 1.35;
+  overflow: hidden;
+}
+
+.bank-actions {
+  display: flex;
+  gap: var(--gap-sm);
+}
+
+.bank-gem-multi {
+  min-width: 28px;
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #1a1000;
+  background: var(--gem-gold);
+  border-radius: 999px;
+  padding: 3px 7px;
 }
