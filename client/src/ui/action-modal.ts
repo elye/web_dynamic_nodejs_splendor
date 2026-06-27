@@ -144,6 +144,29 @@ export function openGemPickerModal(
   openModal(element);
 }
 
+function gemPickerHint(selected: Map<GemColor, number>, bank: GemPool): string {
+  const total = [...selected.values()].reduce((a, b) => a + b, 0);
+  const isDouble = selected.size === 1 && total === 2;
+
+  if (total === 0) return 'Select up to 3 different colours, or 2 of the same (pile ≥ 4)';
+  if (isDouble) return 'Taking 2 of the same colour — confirm or deselect to change';
+  if (total === 3) return 'Maximum 3 gems selected — confirm or deselect to change';
+  if (total === 2) return `${3 - total} more different colour available, or confirm`;
+  return `${3 - total} more different colours available, or confirm`;
+}
+
+/** Returns true if clicking this unselected colour would be a valid addition. */
+function canAddColor(color: GemColor, selected: Map<GemColor, number>, bank: GemPool): boolean {
+  const total = [...selected.values()].reduce((a, b) => a + b, 0);
+  const bankCount = bank[color] ?? 0;
+  if (bankCount === 0) return false;
+  // Already have a double — no more picks allowed
+  if (selected.size === 1 && total === 2) return false;
+  // Already at 3 gems total
+  if (total >= 3) return false;
+  return true;
+}
+
 function renderGemPicker(
   container: HTMLElement,
   bank: GemPool,
@@ -157,7 +180,7 @@ function renderGemPicker(
 
   const hint = document.createElement('p');
   hint.className = 'picker-hint';
-  hint.textContent = 'Select 3 different colours, or 2 of the same (pile ≥ 4)';
+  hint.textContent = gemPickerHint(selected, bank);
   container.appendChild(hint);
 
   const grid = document.createElement('div');
@@ -166,13 +189,19 @@ function renderGemPicker(
   for (const color of GEM_COLORS) {
     const count = bank[color] ?? 0;
     const sel = selected.get(color) ?? 0;
+    const isSelected = sel > 0;
+
+    // A token is interactive if it's already selected (click deselects)
+    // or if adding it would be valid
+    const interactive = isSelected || canAddColor(color, selected, bank);
 
     const col = document.createElement('div');
     col.className = 'picker-col';
 
     const token = renderGemToken(color, undefined, 'sz-lg', {
-      clickable: count > 0,
-      selected: sel > 0,
+      clickable: interactive,
+      selected: isSelected,
+      disabled: !interactive,
       onClick: () => {
         toggleGemSelection(selected, color, bank, onChange);
       },
@@ -219,31 +248,19 @@ function toggleGemSelection(
   const bankCount = bank[color] ?? 0;
 
   if (cur === 0) {
-    if (total >= 3) return; // already at max
-    if (total === 1) {
-      // Check if we're doubling
-      const [existingColor, existingCount] = [...selected.entries()][0];
-      if (existingColor === color) {
-        // Can't happen (cur===0) — safety check
-        return;
-      }
-      // Adding a 2nd different colour
-      selected.set(color, 1);
-    } else if (total === 0) {
-      selected.set(color, 1);
-    } else if (total === 2) {
-      selected.set(color, 1); // 3rd different
-    }
+    // Guard: only add if canAddColor allows it
+    if (!canAddColor(color, selected, bank)) return;
+    selected.set(color, 1);
   } else if (cur === 1) {
-    // Check if we can go to 2 (same colour double-take)
-    if (selected.size === 1 && bankCount >= 4 && total === 1) {
+    // Try upgrading to double-take (only if this is the sole colour and bank has ≥4)
+    if (selected.size === 1 && total === 1 && bankCount >= 4) {
       selected.set(color, 2);
     } else {
       selected.delete(color);
     }
   } else {
-    // cur === 2: deselect back to 1
-    selected.set(color, 1);
+    // cur === 2: deselect back to 0
+    selected.delete(color);
   }
 
   onChange();
