@@ -25,7 +25,8 @@
   display: flex;
   gap: var(--gap);
   padding: var(--gap);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   align-items: flex-start;
   justify-content: center;
   flex: 1;
@@ -95,6 +96,14 @@
   display: flex;
   align-items: center;
   gap: var(--gap-sm);
+}
+
+.bank-gem-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gem-gold);
 }
 
 .bank-gem-count {

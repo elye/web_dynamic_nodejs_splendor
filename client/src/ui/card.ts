@@ -49,6 +49,12 @@ function getCardBackgroundLayers(card: Card): string[] {
   ];
 }
 
+function getNobleArtUrl(noble: Noble): string {
+  const match = noble.id.match(/(\d+)$/);
+  const suffix = match ? match[1].padStart(2, '0') : '01';
+  return `/images/noble/Noble${suffix}.png`;
+}
+
 // ─── Splendor card element ────────────────────────────────────────────────────
 
 export function renderCard(card: Card, opts: CardOptions = {}): HTMLElement {
@@ -147,6 +153,11 @@ export function renderDeckPlaceholder(
 export function renderNobleTile(noble: Noble, size: 'sz-md' | 'sz-sm' = 'sz-md'): HTMLElement {
   const el = document.createElement('div');
   el.className = `noble-tile ${size}`;
+  const nobleArtUrl = getNobleArtUrl(noble);
+  el.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.12), rgba(0,0,0,0.26)), url("${nobleArtUrl}")`;
+  el.style.backgroundSize = 'cover';
+  el.style.backgroundPosition = 'center';
+  el.style.backgroundRepeat = 'no-repeat';
 
   const vp = document.createElement('div');
   vp.className = 'noble-vp';
@@ -157,11 +168,21 @@ export function renderNobleTile(noble: Noble, size: 'sz-md' | 'sz-sm' = 'sz-md')
 
   for (const color of GEM_COLORS) {
     const n = noble.requirement[color];
-    for (let i = 0; i < n; i++) {
-      const pip = document.createElement('div');
-      pip.className = `card-cost-pip ${color}`;
-      req.appendChild(pip);
-    }
+    if (n === 0) continue;
+
+    const row = document.createElement('div');
+    row.className = 'noble-req-row';
+
+    const pip = document.createElement('div');
+    pip.className = `card-cost-pip ${color}`;
+
+    const num = document.createElement('span');
+    num.className = 'noble-req-num';
+    num.textContent = String(n);
+
+    row.appendChild(pip);
+    row.appendChild(num);
+    req.appendChild(row);
   }
 
   el.appendChild(vp);

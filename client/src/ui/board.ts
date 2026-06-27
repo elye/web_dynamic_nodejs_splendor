@@ -86,8 +86,7 @@ export function renderBankPanel(
 
   for (const color of allColors) {
     const count = state.bank[color] ?? 0;
-    const selected = selectedGems.get(color) ?? 0;
-    const isSelected = selected > 0;
+    const isSelected = (selectedGems.get(color) ?? 0) > 0;
 
     const row = document.createElement('div');
     row.className = 'bank-gem-row';
@@ -98,13 +97,15 @@ export function renderBankPanel(
       disabled: count === 0,
       onClick: () => cb.onGemClick(color),
     });
-
-    const countEl = document.createElement('span');
-    countEl.className = 'bank-gem-count';
-    countEl.textContent = selected > 0 ? `${count} (-${selected})` : String(count);
-
     row.appendChild(token);
-    row.appendChild(countEl);
+
+    if (color === 'gold') {
+      const label = document.createElement('span');
+      label.className = 'bank-gem-label';
+      label.textContent = 'Reserve';
+      row.appendChild(label);
+    }
+
     gemsCol.appendChild(row);
   }
 
