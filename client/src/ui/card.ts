@@ -11,14 +11,6 @@ interface CardOptions {
   onClick?: (card: Card) => void;
 }
 
-const CARD_ART_BY_BONUS: Record<GemColor, string> = {
-  white: '/images/tokens/hawker-white.png',
-  blue: '/images/tokens/fisherman-blue.png',
-  green: '/images/tokens/farmer-green.png',
-  red: '/images/tokens/rubber-red.png',
-  black: '/images/tokens/tin-mining-black.png',
-};
-
 const RGBA_BY_COLOR: Record<GemColor, string> = {
   white: 'rgba(240,237,224,0.34)',
   blue: 'rgba(79,163,209,0.34)',
@@ -27,12 +19,12 @@ const RGBA_BY_COLOR: Record<GemColor, string> = {
   black: 'rgba(50,50,50,0.38)',
 };
 
-function buildRequirementOverlay(cost: GemCost): string {
+function buildRequirementOverlayLayers(cost: GemCost): string[] {
   const layers: string[] = [];
   const used = GEM_COLORS.filter((color) => cost[color] > 0);
 
   if (used.length === 0) {
-    return 'radial-gradient(circle at 50% 78%, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.06) 62%, rgba(0,0,0,0.12) 100%)';
+    return ['radial-gradient(circle at 50% 78%, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.06) 62%, rgba(0,0,0,0.12) 100%)'];
   }
 
   for (const color of used) {
@@ -44,17 +36,17 @@ function buildRequirementOverlay(cost: GemCost): string {
     layers.push(`radial-gradient(circle at ${x}% ${y}%, ${RGBA_BY_COLOR[color]} 0%, rgba(0,0,0,0) ${r}%)`);
   }
 
-  return layers.join(', ');
+  return layers;
 }
 
-function buildCardBackground(card: Card): string {
-  const art = CARD_ART_BY_BONUS[card.bonus];
-  const reqOverlay = buildRequirementOverlay(card.cost);
+function getCardBackgroundLayers(card: Card): string[] {
+  const reqOverlay = buildRequirementOverlayLayers(card.cost);
+  const artUrl = `/images/cards/tier${card.tier}_${card.bonus}.png`;
   return [
     'linear-gradient(rgba(255,255,255,0.05), rgba(20,12,6,0.18))',
-    reqOverlay,
-    `url("${art}")`,
-  ].join(', ');
+    ...reqOverlay,
+    `url("${artUrl}")`,
+  ];
 }
 
 // ─── Splendor card element ────────────────────────────────────────────────────
@@ -65,7 +57,13 @@ export function renderCard(card: Card, opts: CardOptions = {}): HTMLElement {
   const el = document.createElement('div');
   el.className = `splendor-card tier-${card.tier} ${size}${interactive ? ' interactive' : ''}${!affordable ? ' unaffordable' : ''}${selected ? ' selected' : ''}`;
   el.dataset.cardId = card.id;
-  el.style.backgroundImage = buildCardBackground(card);
+  const backgroundLayers = getCardBackgroundLayers(card);
+  const lastIndex = backgroundLayers.length - 1;
+  el.style.backgroundImage = backgroundLayers.join(', ');
+  el.style.backgroundSize = backgroundLayers.map((_, i) => (i === lastIndex ? '100% 100%' : 'auto')).join(', ');
+  el.style.backgroundPosition = backgroundLayers.map(() => 'center').join(', ');
+  el.style.backgroundRepeat = backgroundLayers.map(() => 'no-repeat').join(', ');
+  el.style.backgroundBlendMode = backgroundLayers.map((_, i) => (i === 0 ? 'soft-light' : 'normal')).join(', ');
 
   // Header: VP + bonus gem dot
   const header = document.createElement('div');
