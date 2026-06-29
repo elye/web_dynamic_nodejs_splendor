@@ -34,12 +34,20 @@
   flex-shrink: 0;
 }
 .opponent-strip .player-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   font-size: 0.95rem;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 108px;
+}
+.ai-icon {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  line-height: 1;
 }
 .opponent-strip .player-pts {
   font-size: 1.3rem;

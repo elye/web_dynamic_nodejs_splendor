@@ -17,7 +17,14 @@ export function renderOpponentStrip(
   // Name
   const name = document.createElement('div');
   name.className = 'player-name';
-  name.textContent = player.name;
+  if (player.type === 'ai') {
+    const icon = document.createElement('span');
+    icon.className = 'ai-icon';
+    icon.textContent = '🤖';
+    icon.setAttribute('aria-label', 'AI player');
+    name.appendChild(icon);
+  }
+  name.appendChild(document.createTextNode(player.name));
   summary.appendChild(name);
 
   // Points
