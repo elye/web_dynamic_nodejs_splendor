@@ -259,24 +259,29 @@
 }
 
 /* ─── Modal card scaling (sz-lg inside .modal-box) ───────────────────────── */
+/* sz-lg is ~1.31x wider than sz-md (260px vs 198px), so all elements scale by ~1.31x */
 .modal-box .splendor-card.sz-lg .card-vp {
-  font-size: clamp(1.8rem, 2.4vw, 2.6rem);
+  font-size: clamp(3rem, 4.5vw, 4.3rem);
 }
 .modal-box .splendor-card.sz-lg .card-bonus {
-  width: clamp(26px, 2.4vw, 34px);
-  height: clamp(26px, 2.4vw, 34px);
+  width: clamp(48px, 5.5vw, 63px);
+  height: clamp(48px, 5.5vw, 63px);
 }
 .modal-box .splendor-card.sz-lg .card-cost-pip {
-  width: clamp(14px, 1.4vw, 20px);
-  height: clamp(14px, 1.4vw, 20px);
+  width: clamp(30px, 3.2vw, 39px);
+  height: clamp(30px, 3.2vw, 39px);
 }
 .modal-box .splendor-card.sz-lg .cost-num,
 .modal-box .splendor-card.sz-lg .card-cost-row {
-  font-size: clamp(0.9rem, 1.1vw, 1.2rem);
+  font-size: clamp(1.6rem, 2.2vw, 2.5rem);
 }
 .modal-box .noble-tile.sz-lg .noble-vp {
-  font-size: clamp(1.5rem, 2vw, 2rem);
+  font-size: clamp(2rem, 2.8vw, 3rem);
 }
 .modal-box .noble-tile.sz-lg .noble-req-num {
-  font-size: clamp(0.9rem, 1.1vw, 1.2rem);
+  font-size: clamp(1.3rem, 1.8vw, 1.9rem);
+}
+.modal-box .noble-tile.sz-lg .card-cost-pip {
+  width: clamp(20px, 2.2vw, 28px);
+  height: clamp(20px, 2.2vw, 28px);
 }
