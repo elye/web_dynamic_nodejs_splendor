@@ -172,9 +172,10 @@ h1, h2, h3 { font-weight: 700; letter-spacing: 0.02em; }
   gap: var(--gap-sm);
   font-size: clamp(0.85rem, 1.1vw, 1rem);
 }
-.slot-label { width: 56px; color: var(--text-muted); }
-.slot-toggle { display: flex; align-items: center; gap: 6px; cursor: pointer; flex: 1; color: var(--text-primary); }
-.diff-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: var(--text-primary); border-radius: var(--radius-sm); padding: 4px 8px; font-size: clamp(0.8rem, 1vw, 0.9rem); }
+.slot-label { width: 56px; flex-shrink: 0; color: var(--text-muted); }
+.slot-toggle { display: flex; align-items: center; gap: 6px; cursor: pointer; flex-shrink: 0; white-space: nowrap; color: var(--text-primary); }
+.slot-toggle input[type="checkbox"] { flex-shrink: 0; }
+.diff-select { flex: 1; min-width: 0; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: var(--text-primary); border-radius: var(--radius-sm); padding: 4px 8px; font-size: clamp(0.8rem, 1vw, 0.9rem); }
 
 /* ─── Waiting room ───────────────────────────────────────────────────────── */
 .waiting-room {

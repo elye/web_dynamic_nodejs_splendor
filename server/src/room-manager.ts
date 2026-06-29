@@ -51,11 +51,16 @@ export function createRoom(
   const slots: PlayerSlot[] = Array.from({ length: totalSlots }, (_, i) => {
     const aiSlot = aiSlots.find(a => a.slotIndex === i);
     if (aiSlot) {
+      const aiNames: Record<AiDifficulty, string> = {
+        easy: 'Estaria',
+        medium: 'Midarvy',
+        hard: 'Hadie',
+      };
       return {
         type: 'ai' as PlayerType,
         aiDifficulty: aiSlot.difficulty,
         playerId: `ai-${code}-${i}`,
-        playerName: `AI (${aiSlot.difficulty.charAt(0).toUpperCase() + aiSlot.difficulty.slice(1)})`,
+        playerName: aiNames[aiSlot.difficulty],
       };
     }
     return { type: 'human' as PlayerType };
