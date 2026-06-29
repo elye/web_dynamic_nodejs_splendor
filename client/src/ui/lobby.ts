@@ -167,12 +167,19 @@ function renderWaitingRoom(room: ReturnType<typeof getState>['room'] & object): 
         </li>
       `).join('')}
     </ul>
-    ${isHost ? `<button id="start-btn" class="btn btn-primary" ${canStart ? '' : 'disabled'}>Start Game</button>` : '<p class="waiting-msg">Waiting for host to start…</p>'}
+    ${isHost ? `
+      <label class="random-start-toggle">
+        <input type="checkbox" id="random-start-cb" />
+        Random start order
+      </label>
+      <button id="start-btn" class="btn btn-primary" ${canStart ? '' : 'disabled'}>Start Game</button>
+    ` : '<p class="waiting-msg">Waiting for host to start…</p>'}
   `;
 
   if (isHost) {
     el.querySelector('#start-btn')!.addEventListener('click', () => {
-      send({ type: 'START_GAME', roomCode: room.roomCode });
+      const randomStart = (el.querySelector<HTMLInputElement>('#random-start-cb')?.checked) ?? false;
+      send({ type: 'START_GAME', roomCode: room.roomCode, randomStart });
     });
   }
 

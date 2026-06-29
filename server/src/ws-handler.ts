@@ -111,7 +111,7 @@ async function handleMessage(socket: WebSocket, msg: ClientMessage): Promise<voi
         send(socket, { type: 'ERROR', code: 'NOT_HOST', message: 'Only the host can start' });
         return;
       }
-      const result = startGame(room);
+      const result = startGame(room, msg.randomStart ?? false);
       if (!result.ok) {
         send(socket, { type: 'ERROR', code: 'START_FAILED', message: result.error });
         return;

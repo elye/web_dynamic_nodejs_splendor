@@ -106,7 +106,7 @@ export function joinRoom(
   return { ok: true };
 }
 
-export function startGame(room: Room): { ok: true } | { ok: false; error: string } {
+export function startGame(room: Room, randomStart = false): { ok: true } | { ok: false; error: string } {
   if (room.phase !== 'lobby') {
     return { ok: false, error: 'Game already started' };
   }
@@ -129,6 +129,7 @@ export function startGame(room: Room): { ok: true } | { ok: false; error: string
       type: s.type,
       aiDifficulty: s.aiDifficulty,
     })),
+    randomStart,
   );
   room.phase = 'playing';
   return { ok: true };

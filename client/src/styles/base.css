@@ -197,6 +197,22 @@ h1, h2, h3 { font-weight: 700; letter-spacing: 0.02em; }
 .ai-badge { font-size: clamp(0.7rem, 0.9vw, 0.85rem); background: rgba(79,163,209,0.25); color: var(--gem-blue); border-radius: 4px; padding: 2px 8px; text-transform: capitalize; }
 .host-badge { font-size: clamp(0.7rem, 0.9vw, 0.85rem); background: rgba(245,200,66,0.25); color: var(--gem-gold); border-radius: 4px; padding: 2px 8px; }
 .waiting-msg { color: var(--text-muted); font-style: italic; font-size: clamp(0.9rem, 1.1vw, 1.05rem); }
+.random-start-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
+  color: var(--text-muted);
+  user-select: none;
+}
+.random-start-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--gem-gold);
+  cursor: pointer;
+}
+.random-start-toggle:has(input:checked) { color: var(--gem-gold); }
 
 /* ─── Turn indicator toast ────────────────────────────────────────────────── */
 .turn-toast {
