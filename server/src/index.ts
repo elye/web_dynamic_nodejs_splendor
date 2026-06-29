@@ -54,6 +54,12 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
 // ─── HTTP server ──────────────────────────────────────────────────────────────
 
 const server = http.createServer((req, res) => {
+  // Keep-alive ping endpoint (used by client on Render free tier)
+  if (req.url === '/ping' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('pong');
+    return;
+  }
   serveStatic(req, res);
 });
 

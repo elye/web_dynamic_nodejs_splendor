@@ -5,6 +5,7 @@ import './styles/board.css';
 import './styles/panels.css';
 
 import { connect, onMessage, send } from './ws-client.js';
+import { startKeepAlive, stopKeepAlive } from './keep-alive.js';
 import { setPlayerId, setRoom, setGame, getState, subscribe } from './state.js';
 import type { AppState } from './state.js';
 import { renderLobby } from './ui/lobby.js';
@@ -62,6 +63,7 @@ onMessage((msg) => {
 
 function render(state: AppState): void {
   if (state.screen === 'lobby') {
+    stopKeepAlive();
     removeFullscreenToggle();
     void exitFullscreenIfNeeded();
     lastTurnToastKey = null;
@@ -75,6 +77,7 @@ function render(state: AppState): void {
   }
 
   if (state.screen === 'game' && state.game) {
+    startKeepAlive();
     ensureFullscreenToggle();
     renderGameScreen(state);
   }
