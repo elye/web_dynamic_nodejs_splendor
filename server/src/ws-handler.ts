@@ -250,7 +250,8 @@ async function runAiTurnsIfNeeded(room: Room): Promise<void> {
   if (!game || room.phase !== 'playing') return;
 
   while (true) {
-    const currentSlot = room.slots[game.currentPlayerIndex];
+    const currentPlayerId = game.players[game.currentPlayerIndex]?.id;
+    const currentSlot = room.slots.find(s => s.playerId === currentPlayerId);
     if (!currentSlot || currentSlot.type !== 'ai') break;
 
     const endgameTriggered = endgameFlags.get(room.code) ?? false;
@@ -275,8 +276,10 @@ async function runAiTurnsIfNeeded(room: Room): Promise<void> {
 function isCurrentPlayer(room: Room, playerId: string): boolean {
   const game = room.game as InternalGameState | null;
   if (!game) return false;
-  const slot = room.slots[game.currentPlayerIndex];
-  return slot?.playerId === playerId && slot.type === 'human';
+  const currentPlayer = game.players[game.currentPlayerIndex];
+  if (!currentPlayer || currentPlayer.id !== playerId) return false;
+  const slot = room.slots.find(s => s.playerId === playerId);
+  return slot?.type === 'human';
 }
 
 function completeTurn(room: Room, game: InternalGameState): void {
