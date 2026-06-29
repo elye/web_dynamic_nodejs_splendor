@@ -41,7 +41,7 @@ export function openCardModal(
   const frag = document.createElement('div');
   frag.className = 'card-modal';
 
-  const cardEl = renderCard(card, { size: 'sz-md' });
+  const cardEl = renderCard(card, { size: 'sz-lg' });
   frag.appendChild(cardEl);
 
   const actions = document.createElement('div');
@@ -201,7 +201,7 @@ function renderGemPicker(
     const col = document.createElement('div');
     col.className = 'picker-col';
 
-    const token = renderGemToken(color, undefined, 'sz-lg', {
+    const token = renderGemToken(color, undefined, 'sz-xl', {
       clickable: interactive,
       selected: isSelected,
       disabled: !interactive,
@@ -317,7 +317,7 @@ export function openNobleChoiceModal(nobles: Noble[]): void {
     btn.className = 'noble-choice-btn';
     btn.type = 'button';
     btn.title = 'Choose this noble';
-    btn.appendChild(renderNobleTile(noble, 'sz-sm', { showRequirementNumbers: false }));
+    btn.appendChild(renderNobleTile(noble, 'sz-lg', { showRequirementNumbers: true }));
     btn.addEventListener('click', () => {
       send({ type: 'CHOOSE_NOBLE', nobleId: noble.id });
       closeModal();
@@ -355,7 +355,7 @@ function renderDiscardPicker(
     col.className = 'picker-col discard-picker-col';
 
     const canAdd = sel < have && totalSelected < excess;
-    const token = renderGemToken(color, have, 'sz-md', {
+    const token = renderGemToken(color, have, 'sz-xl', {
       clickable: sel > 0 || canAdd,
       selected: sel > 0,
       onClick: () => {
@@ -414,24 +414,24 @@ const modalStyles = `
 .modal-box {
   background: #16261a;
   border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 14px;
-  padding: 28px;
-  max-width: 420px;
-  width: 90%;
-  display: flex; flex-direction: column; gap: 16px;
+  border-radius: 16px;
+  padding: clamp(28px, 3vw, 48px);
+  max-width: clamp(480px, 50vw, 680px);
+  width: 92%;
+  display: flex; flex-direction: column; gap: 22px;
 }
 .modal-box.modal-box-discard {
-  max-width: 520px;
+  max-width: clamp(560px, 60vw, 800px);
 }
-.modal-box h3 { color: var(--gem-gold); font-size: 1.2rem; }
-.modal-box p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
-.modal-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
-.card-modal { display: flex; flex-direction: column; gap: 16px; align-items: center; }
-.picker-hint { font-size: 0.8rem; color: var(--text-muted); text-align: center; }
-.picker-grid { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-.picker-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.picker-info { font-size: 0.72rem; color: var(--text-muted); }
-.gem-picker-modal { display: flex; flex-direction: column; gap: 16px; align-items: center; }
+.modal-box h3 { color: var(--gem-gold); font-size: clamp(1.3rem, 2vw, 1.7rem); }
+.modal-box p { color: var(--text-muted); font-size: clamp(0.95rem, 1.2vw, 1.1rem); line-height: 1.6; }
+.modal-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: flex-end; }
+.card-modal { display: flex; flex-direction: column; gap: 22px; align-items: center; }
+.picker-hint { font-size: clamp(0.9rem, 1.1vw, 1.05rem); color: var(--text-muted); text-align: center; }
+.picker-grid { display: flex; gap: clamp(16px, 2vw, 28px); justify-content: center; flex-wrap: wrap; }
+.picker-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.picker-info { font-size: clamp(0.95rem, 1.2vw, 1.2rem); color: var(--text-muted); font-weight: 600; }
+.gem-picker-modal { display: flex; flex-direction: column; gap: 22px; align-items: center; }
 .discard-modal { align-items: stretch; width: 100%; }
 .discard-modal .picker-grid {
   justify-content: space-between;
@@ -439,30 +439,30 @@ const modalStyles = `
 }
 .discard-modal .discard-picker-col {
   flex-direction: row;
-  min-width: 64px;
+  min-width: 72px;
   justify-content: center;
 }
 .discard-modal .discard-badge {
-  min-width: 28px;
+  min-width: 32px;
   text-align: left;
   font-weight: 700;
 }
 .discard-modal .discard-badge.is-empty {
   visibility: hidden;
 }
-.discard-modal .modal-actions { width: 100%; margin-top: 8px; }
-.noble-choice-modal { display: flex; flex-direction: column; gap: 14px; align-items: center; }
-.noble-choice-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.discard-modal .modal-actions { width: 100%; margin-top: 12px; }
+.noble-choice-modal { display: flex; flex-direction: column; gap: 18px; align-items: center; }
+.noble-choice-row { display: flex; gap: clamp(14px, 2vw, 24px); flex-wrap: wrap; justify-content: center; }
 .noble-choice-btn {
   background: transparent;
   border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 10px;
-  padding: 6px;
+  border-radius: 12px;
+  padding: 10px;
   cursor: pointer;
 }
 .noble-choice-btn:hover {
   border-color: var(--gem-gold);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 `;
 

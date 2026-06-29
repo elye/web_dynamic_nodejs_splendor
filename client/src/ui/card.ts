@@ -1,7 +1,7 @@
 import type { Card, Noble, GemColor, GemCost } from '@splendor/shared';
 import { GEM_COLORS } from '@splendor/shared';
 
-type CardSize = 'sz-md' | 'sz-sm' | 'sz-xs';
+type CardSize = 'sz-lg' | 'sz-md' | 'sz-sm' | 'sz-xs';
 
 interface CardOptions {
   size?: CardSize;
@@ -131,8 +131,12 @@ export function renderDeckPlaceholder(
   interactive = false,
   onClick?: () => void,
 ): HTMLElement {
+  const bgSuffix = tier === 2 ? 'tier2-background' : `tier${tier}_background`;
   const el = document.createElement('div');
   el.className = `deck-placeholder tier-${tier} ${size}${interactive && count > 0 ? ' interactive' : ''}`;
+  el.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.42)), url("/images/cards/${bgSuffix}.png")`;
+  el.style.backgroundSize = 'cover';
+  el.style.backgroundPosition = 'center';
 
   const countEl = document.createElement('div');
   countEl.className = 'deck-count';
@@ -156,7 +160,7 @@ export function renderDeckPlaceholder(
 
 export function renderNobleTile(
   noble: Noble,
-  size: 'sz-md' | 'sz-sm' = 'sz-md',
+  size: 'sz-lg' | 'sz-md' | 'sz-sm' = 'sz-md',
   opts: NobleTileOptions = {},
 ): HTMLElement {
   const { showRequirementNumbers = true } = opts;
@@ -207,7 +211,7 @@ export function renderNobleTile(
 // ─── Gem token element ────────────────────────────────────────────────────────
 
 type GemColorOrGold = GemColor | 'gold';
-type TokenSize = 'sz-lg' | 'sz-md' | 'sz-sm';
+type TokenSize = 'sz-xl' | 'sz-lg' | 'sz-md' | 'sz-sm';
 
 export function renderGemToken(
   color: GemColorOrGold,
