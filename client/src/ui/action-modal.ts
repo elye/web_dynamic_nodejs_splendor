@@ -354,23 +354,21 @@ function renderDiscardPicker(
     const col = document.createElement('div');
     col.className = 'picker-col discard-picker-col';
 
+    const canAdd = sel < have && totalSelected < excess;
     const token = renderGemToken(color, have, 'sz-md', {
-      clickable: sel > 0 || (sel < have && totalSelected < excess),
+      clickable: sel > 0 || canAdd,
       selected: sel > 0,
       onClick: () => {
         const cur = selected.get(color) ?? 0;
         const tot = [...selected.values()].reduce((a, b) => a + b, 0);
-
-        if (cur > 0) {
-          if (cur === 1) {
-            selected.delete(color);
-          } else {
-            selected.set(color, cur - 1);
-          }
-        } else if (tot < excess) {
+        const maxCanAdd = Math.min(have, cur + (excess - tot));
+        if (cur < maxCanAdd) {
+          // Still room to add more of this color
           selected.set(color, cur + 1);
+        } else {
+          // At max for this color (or quota full) — reset to 0
+          selected.delete(color);
         }
-
         onChange();
       },
     });
