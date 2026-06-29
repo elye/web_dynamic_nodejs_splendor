@@ -165,10 +165,10 @@
 .deck-placeholder.sz-sm  { width: 144px; height: 185px; }
 
 .deck-count {
-  font-size: 1.1rem;
+  font-size: 2.2rem;
   font-weight: 800;
 }
-.deck-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.deck-label { font-size: 0.93rem; text-transform: uppercase; letter-spacing: 0.08em; }
 
 /* ─── Noble tile ─────────────────────────────────────────────────────────── */
 .noble-tile {

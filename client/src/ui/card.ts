@@ -131,8 +131,12 @@ export function renderDeckPlaceholder(
   interactive = false,
   onClick?: () => void,
 ): HTMLElement {
+  const bgSuffix = tier === 2 ? 'tier2-background' : `tier${tier}_background`;
   const el = document.createElement('div');
   el.className = `deck-placeholder tier-${tier} ${size}${interactive && count > 0 ? ' interactive' : ''}`;
+  el.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.42)), url("/images/cards/${bgSuffix}.png")`;
+  el.style.backgroundSize = 'cover';
+  el.style.backgroundPosition = 'center';
 
   const countEl = document.createElement('div');
   countEl.className = 'deck-count';
