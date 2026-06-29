@@ -32,6 +32,7 @@
 .splendor-card.unaffordable { opacity: 0.55; }
 
 /* ─── Sizes ──────────────────────────────────────────────────────────────── */
+.splendor-card.sz-lg { width: clamp(180px, 17vw, 260px); height: clamp(225px, 21vw, 325px); }
 .splendor-card.sz-md { width: 88px; height: 110px; }
 .splendor-card.sz-sm { width: 64px; height: 82px; }
 .splendor-card.sz-xs { width: 46px; height: 58px; }
@@ -170,6 +171,7 @@
   box-shadow: var(--shadow);
   flex-shrink: 0;
 }
+.noble-tile.sz-lg { width: clamp(150px, 13vw, 200px); height: clamp(162px, 14vw, 216px); }
 .noble-tile.sz-md { width: 82px; height: 88px; }
 .noble-tile.sz-sm { width: 60px; height: 66px; }
 .noble-vp {
@@ -240,4 +242,27 @@
     width: 20px;
     height: 20px;
   }
+}
+
+/* ─── Modal card scaling (sz-lg inside .modal-box) ───────────────────────── */
+.modal-box .splendor-card.sz-lg .card-vp {
+  font-size: clamp(1.8rem, 2.4vw, 2.6rem);
+}
+.modal-box .splendor-card.sz-lg .card-bonus {
+  width: clamp(26px, 2.4vw, 34px);
+  height: clamp(26px, 2.4vw, 34px);
+}
+.modal-box .splendor-card.sz-lg .card-cost-pip {
+  width: clamp(14px, 1.4vw, 20px);
+  height: clamp(14px, 1.4vw, 20px);
+}
+.modal-box .splendor-card.sz-lg .cost-num,
+.modal-box .splendor-card.sz-lg .card-cost-row {
+  font-size: clamp(0.9rem, 1.1vw, 1.2rem);
+}
+.modal-box .noble-tile.sz-lg .noble-vp {
+  font-size: clamp(1.5rem, 2vw, 2rem);
+}
+.modal-box .noble-tile.sz-lg .noble-req-num {
+  font-size: clamp(0.9rem, 1.1vw, 1.2rem);
 }
