@@ -33,9 +33,9 @@
 
 /* ─── Sizes ──────────────────────────────────────────────────────────────── */
 .splendor-card.sz-lg { width: clamp(180px, 17vw, 260px); height: clamp(225px, 21vw, 325px); }
-.splendor-card.sz-md { width: 88px; height: 110px; }
-.splendor-card.sz-sm { width: 64px; height: 82px; }
-.splendor-card.sz-xs { width: 46px; height: 58px; }
+.splendor-card.sz-md { width: 198px; height: 248px; }
+.splendor-card.sz-sm { width: 144px; height: 185px; }
+.splendor-card.sz-xs { width: 104px; height: 131px; }
 
 /* ─── Tier overlays ─────────────────────────────────────────────────────────── */
 .splendor-card.tier-1 { background-color: #efe3bf; color: #2a1e00; }
@@ -52,28 +52,28 @@
 }
 
 .card-vp {
-  font-size: 1.2rem;
+  font-size: 3.3rem;
   font-weight: 800;
   line-height: 1;
-  min-width: 20px;
+  min-width: 48px;
   color: #fff;
   text-shadow: 0 1px 2px rgba(0,0,0,0.6);
 }
 .card-vp.zero { opacity: 0; }   /* hide VP=0 */
 
 .card-bonus {
-  width: 18px;
-  height: 18px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   border: 2px solid #f2d36a;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.35);
   flex-shrink: 0;
 }
-.card-bonus.white { background: var(--gem-white); }
-.card-bonus.blue  { background: var(--gem-blue); }
-.card-bonus.green { background: var(--gem-green); }
-.card-bonus.red   { background: var(--gem-red); }
-.card-bonus.black { background: var(--gem-black); }
+.card-bonus.white { background: radial-gradient(circle at 40% 35%, #fff 0%, #c9c4ae 100%); }
+.card-bonus.blue  { background: radial-gradient(circle at 40% 35%, #7bc8ec 0%, #2d7aab 100%); }
+.card-bonus.green { background: radial-gradient(circle at 40% 35%, #7ed98a 0%, #2e7d42 100%); }
+.card-bonus.red   { background: radial-gradient(circle at 40% 35%, #f08080 0%, #a82020 100%); }
+.card-bonus.black { background: radial-gradient(circle at 40% 35%, #666 0%, #111 100%); }
 
 /* ─── Card body (cost pips) ────────────────────────────────────────────────── */
 .card-body {
@@ -96,35 +96,49 @@
 .card-cost-row {
   display: flex;
   align-items: center;
-  gap: 3px;
-  font-size: 0.68rem;
+  gap: 6px;
+  font-size: 1.2rem;
   font-weight: 700;
 }
 
+.splendor-card .card-cost-row {
+  font-size: 1.8rem;
+}
+
 .card-cost-pip {
-  width: 10px;
-  height: 10px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  border: 1.5px solid #f2d36a;
+  border: 2px solid #f2d36a;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.35);
   flex-shrink: 0;
 }
-.card-cost-pip.white { background: var(--gem-white); }
-.card-cost-pip.blue  { background: var(--gem-blue); }
-.card-cost-pip.green { background: var(--gem-green); }
-.card-cost-pip.red   { background: var(--gem-red); }
-.card-cost-pip.black { background: var(--gem-black); }
+
+.splendor-card .card-cost-pip {
+  width: 30px;
+  height: 30px;
+}
+.card-cost-pip.white { background: radial-gradient(circle at 40% 35%, #fff 0%, #c9c4ae 100%); }
+.card-cost-pip.blue  { background: radial-gradient(circle at 40% 35%, #7bc8ec 0%, #2d7aab 100%); }
+.card-cost-pip.green { background: radial-gradient(circle at 40% 35%, #7ed98a 0%, #2e7d42 100%); }
+.card-cost-pip.red   { background: radial-gradient(circle at 40% 35%, #f08080 0%, #a82020 100%); }
+.card-cost-pip.black { background: radial-gradient(circle at 40% 35%, #666 0%, #111 100%); }
 
 .cost-num {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 12px;
-  font-size: 0.7rem;
+  min-width: 18px;
+  font-size: 1.25rem;
   font-weight: 700;
   line-height: 1;
   color: #fff;
   text-shadow: 0 1px 1px rgba(0,0,0,0.55);
+}
+
+.splendor-card .cost-num {
+  min-width: 26px;
+  font-size: 1.88rem;
 }
 .tier-3 .cost-num {
   color: #fff;
@@ -147,8 +161,8 @@
 .deck-placeholder.tier-1 { border-color: var(--tier1-border); color: var(--tier1-border); background: rgba(232,223,200,0.08); }
 .deck-placeholder.tier-2 { border-color: var(--tier2-border); color: var(--tier2-border); background: rgba(247,224,122,0.08); }
 .deck-placeholder.tier-3 { border-color: #4a5a9e; color: #8898d8; background: rgba(42,58,110,0.3); }
-.deck-placeholder.sz-md  { width: 88px; height: 110px; }
-.deck-placeholder.sz-sm  { width: 64px; height: 82px; }
+.deck-placeholder.sz-md  { width: 198px; height: 248px; }
+.deck-placeholder.sz-sm  { width: 144px; height: 185px; }
 
 .deck-count {
   font-size: 1.1rem;
@@ -172,10 +186,10 @@
   flex-shrink: 0;
 }
 .noble-tile.sz-lg { width: clamp(150px, 13vw, 200px); height: clamp(162px, 14vw, 216px); }
-.noble-tile.sz-md { width: 82px; height: 88px; }
-.noble-tile.sz-sm { width: 60px; height: 66px; }
+.noble-tile.sz-md { width: 123px; height: 132px; }
+.noble-tile.sz-sm { width: 90px; height: 99px; }
 .noble-vp {
-  font-size: 1.1rem;
+  font-size: 2.2rem;
   font-weight: 800;
   color: #fff;
   align-self: flex-start;
@@ -200,7 +214,7 @@
 }
 
 .noble-req-num {
-  font-size: 0.66rem;
+  font-size: 1.3rem;
   font-weight: 800;
   line-height: 1;
   color: #fff;
@@ -211,13 +225,13 @@
 @media (orientation: portrait) and (min-width: 700px) {
   .board-area .splendor-card.sz-md,
   .board-area .deck-placeholder.sz-md {
-    width: 145px;
-    height: 182px;
+    width: 198px;
+    height: 249px;
   }
 
   .board-area .noble-tile.sz-md {
-    width: 135px;
-    height: 145px;
+    width: 185px;
+    height: 198px;
   }
 }
 
@@ -235,12 +249,12 @@
   }
 
   .board-area .card-vp {
-    font-size: 1.35rem;
+    font-size: 2.4rem;
   }
 
   .board-area .card-bonus {
-    width: 20px;
-    height: 20px;
+    width: 34px;
+    height: 34px;
   }
 }
 
