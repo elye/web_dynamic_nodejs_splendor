@@ -10,6 +10,11 @@ shared/dist/
 # TypeScript
 *.tsbuildinfo
 **/*.tsbuildinfo
+**/*.js
+**/*.d.ts
+**/*.d.ts.map
+!vite.config.ts
+!tsconfig*.json
 
 # Vite
 client/.vite/

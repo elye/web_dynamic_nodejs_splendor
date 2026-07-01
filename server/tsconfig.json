@@ -2,9 +2,12 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
+    "rootDir": "src",
+    "baseUrl": ".",
+    "skipLibCheck": true,
     "paths": {
-      "@splendor/shared": ["../shared/src/index.ts"]
+      "@splendor/shared": ["../shared/dist/index.js"]
     }
   },
-  "include": ["src", "../shared/src"]
+  "include": ["src"]
 }
