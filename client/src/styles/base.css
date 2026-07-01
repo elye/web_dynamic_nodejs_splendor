@@ -38,6 +38,7 @@
 
 html, body {
   height: 100%;
+  height: 100dvh; /* Safari: use dynamic viewport height to exclude browser chrome */
   font-family: 'Georgia', 'Times New Roman', serif;
   background: var(--bg-table);
   color: var(--text-primary);
@@ -46,6 +47,7 @@ html, body {
 
 #app {
   height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
 }
@@ -172,9 +174,10 @@ h1, h2, h3 { font-weight: 700; letter-spacing: 0.02em; }
   gap: var(--gap-sm);
   font-size: clamp(0.85rem, 1.1vw, 1rem);
 }
-.slot-label { width: 56px; color: var(--text-muted); }
-.slot-toggle { display: flex; align-items: center; gap: 6px; cursor: pointer; flex: 1; color: var(--text-primary); }
-.diff-select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: var(--text-primary); border-radius: var(--radius-sm); padding: 4px 8px; font-size: clamp(0.8rem, 1vw, 0.9rem); }
+.slot-label { width: 56px; flex-shrink: 0; color: var(--text-muted); }
+.slot-toggle { display: flex; align-items: center; gap: 6px; cursor: pointer; flex-shrink: 0; white-space: nowrap; color: var(--text-primary); }
+.slot-toggle input[type="checkbox"] { flex-shrink: 0; }
+.diff-select { flex: 1; min-width: 0; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); color: var(--text-primary); border-radius: var(--radius-sm); padding: 4px 8px; font-size: clamp(0.8rem, 1vw, 0.9rem); }
 
 /* ─── Waiting room ───────────────────────────────────────────────────────── */
 .waiting-room {
@@ -197,6 +200,22 @@ h1, h2, h3 { font-weight: 700; letter-spacing: 0.02em; }
 .ai-badge { font-size: clamp(0.7rem, 0.9vw, 0.85rem); background: rgba(79,163,209,0.25); color: var(--gem-blue); border-radius: 4px; padding: 2px 8px; text-transform: capitalize; }
 .host-badge { font-size: clamp(0.7rem, 0.9vw, 0.85rem); background: rgba(245,200,66,0.25); color: var(--gem-gold); border-radius: 4px; padding: 2px 8px; }
 .waiting-msg { color: var(--text-muted); font-style: italic; font-size: clamp(0.9rem, 1.1vw, 1.05rem); }
+.random-start-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
+  color: var(--text-muted);
+  user-select: none;
+}
+.random-start-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--gem-gold);
+  cursor: pointer;
+}
+.random-start-toggle:has(input:checked) { color: var(--gem-gold); }
 
 /* ─── Turn indicator toast ────────────────────────────────────────────────── */
 .turn-toast {
@@ -234,7 +253,30 @@ h1, h2, h3 { font-weight: 700; letter-spacing: 0.02em; }
   display: flex; flex-direction: column; gap: 16px;
 }
 .game-over-title { font-size: 2rem; color: var(--gem-gold); }
-.game-over-winners { font-size: 1.1rem; }
+.game-over-leaderboard {
+  list-style: none;
+  padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 8px;
+  width: 100%;
+}
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  font-size: 1rem;
+}
+.leaderboard-winner {
+  background: rgba(212,175,55,0.18);
+  border: 1px solid rgba(212,175,55,0.45);
+}
+.lb-rank { width: 32px; text-align: center; font-weight: 700; color: var(--text-muted); flex-shrink: 0; }
+.leaderboard-winner .lb-rank { color: var(--gem-gold); font-size: 1.2rem; }
+.lb-name { flex: 1; font-weight: 600; text-align: left; display: flex; align-items: center; gap: 5px; }
+.leaderboard-winner .lb-name { color: var(--gem-gold); }
+.lb-pts { font-weight: 800; color: var(--gem-gold); flex-shrink: 0; }
 
 /* ─── In-game fullscreen toggle ───────────────────────────────────────────── */
 .fullscreen-toggle-btn {

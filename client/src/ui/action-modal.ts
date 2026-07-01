@@ -7,13 +7,15 @@ import { send } from '../ws-client.js';
 
 let modalOverlay: HTMLElement | null = null;
 
-function openModal(content: HTMLElement): void {
+function openModal(content: HTMLElement, dismissOnOutsideClick = true): void {
   closeModal();
   modalOverlay = document.createElement('div');
   modalOverlay.className = 'modal-overlay';
-  modalOverlay.addEventListener('click', (e) => {
-    if (e.target === modalOverlay) closeModal();
-  });
+  if (dismissOnOutsideClick) {
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+  }
   const box = document.createElement('div');
   box.className = 'modal-box';
   if (content.classList.contains('discard-modal')) {
@@ -292,7 +294,7 @@ export function openDiscardModal(excess: number, myGems: GemPool): void {
   element = document.createElement('div');
   element.className = 'gem-picker-modal discard-modal';
   rebuild();
-  openModal(element);
+  openModal(element, false);
 }
 
 // ─── Noble choice modal ──────────────────────────────────────────────────────

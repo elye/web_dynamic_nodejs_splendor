@@ -32,10 +32,12 @@
 .splendor-card.unaffordable { opacity: 0.55; }
 
 /* ─── Sizes ──────────────────────────────────────────────────────────────── */
-.splendor-card.sz-lg { width: clamp(180px, 17vw, 260px); height: clamp(225px, 21vw, 325px); }
-.splendor-card.sz-md { width: 198px; height: 248px; }
-.splendor-card.sz-sm { width: 144px; height: 185px; }
-.splendor-card.sz-xs { width: 104px; height: 131px; }
+/* All splendor cards use a fixed 4:5 aspect ratio; only width is tuned per breakpoint. */
+.splendor-card { aspect-ratio: 4 / 5; }
+.splendor-card.sz-lg { width: clamp(180px, 17vw, 260px); height: auto; }
+.splendor-card.sz-md { width: var(--card-w, 148px); height: auto; }
+.splendor-card.sz-sm { width: 144px; height: auto; }
+.splendor-card.sz-xs { width: 104px; height: auto; }
 
 /* ─── Tier overlays ─────────────────────────────────────────────────────────── */
 .splendor-card.tier-1 { background-color: #efe3bf; color: #2a1e00; }
@@ -52,18 +54,18 @@
 }
 
 .card-vp {
-  font-size: 3.3rem;
+  font-size: clamp(1.8rem, 3.2vh, 3.3rem);
   font-weight: 800;
   line-height: 1;
-  min-width: 48px;
+  min-width: clamp(28px, 4vh, 48px);
   color: #fff;
   text-shadow: 0 1px 2px rgba(0,0,0,0.6);
 }
 .card-vp.zero { opacity: 0; }   /* hide VP=0 */
 
 .card-bonus {
-  width: 48px;
-  height: 48px;
+  width: clamp(26px, 4.2vh, 48px);
+  height: clamp(26px, 4.2vh, 48px);
   border-radius: 50%;
   border: 2px solid #f2d36a;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.35);
@@ -102,7 +104,7 @@
 }
 
 .splendor-card .card-cost-row {
-  font-size: 1.8rem;
+  font-size: clamp(1rem, 1.6vh, 1.8rem);
 }
 
 .card-cost-pip {
@@ -115,8 +117,8 @@
 }
 
 .splendor-card .card-cost-pip {
-  width: 30px;
-  height: 30px;
+  width: clamp(16px, 2.6vh, 30px);
+  height: clamp(16px, 2.6vh, 30px);
 }
 .card-cost-pip.white { background: radial-gradient(circle at 40% 35%, #fff 0%, #c9c4ae 100%); }
 .card-cost-pip.blue  { background: radial-gradient(circle at 40% 35%, #7bc8ec 0%, #2d7aab 100%); }
@@ -137,8 +139,8 @@
 }
 
 .splendor-card .cost-num {
-  min-width: 26px;
-  font-size: 1.88rem;
+  min-width: clamp(14px, 2.4vh, 26px);
+  font-size: clamp(1rem, 1.7vh, 1.88rem);
 }
 .tier-3 .cost-num {
   color: #fff;
@@ -161,14 +163,22 @@
 .deck-placeholder.tier-1 { border-color: var(--tier1-border); color: var(--tier1-border); background: rgba(232,223,200,0.08); }
 .deck-placeholder.tier-2 { border-color: var(--tier2-border); color: var(--tier2-border); background: rgba(247,224,122,0.08); }
 .deck-placeholder.tier-3 { border-color: #4a5a9e; color: #8898d8; background: rgba(42,58,110,0.3); }
-.deck-placeholder.sz-md  { width: 198px; height: 248px; }
-.deck-placeholder.sz-sm  { width: 144px; height: 185px; }
+.deck-placeholder { aspect-ratio: 4 / 5; }
+.deck-placeholder.sz-md  { width: var(--card-w, 148px); height: auto; }
+.deck-placeholder.sz-sm  { width: 144px; height: auto; }
 
 .deck-count {
-  font-size: 2.2rem;
+  /* Sized relative to card width so it never forces the deck taller than aspect-ratio. */
+  font-size: min(2.2rem, calc(var(--card-w, 148px) * 0.28));
   font-weight: 800;
+  line-height: 1;
 }
-.deck-label { font-size: 0.93rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.deck-label {
+  font-size: min(0.93rem, calc(var(--card-w, 148px) * 0.11));
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
 
 /* ─── Noble tile ─────────────────────────────────────────────────────────── */
 .noble-tile {
@@ -185,11 +195,12 @@
   box-shadow: var(--shadow);
   flex-shrink: 0;
 }
-.noble-tile.sz-lg { width: clamp(150px, 13vw, 200px); height: clamp(162px, 14vw, 216px); }
-.noble-tile.sz-md { width: 123px; height: 132px; }
-.noble-tile.sz-sm { width: 90px; height: 99px; }
+.noble-tile { aspect-ratio: 1 / 1; }
+.noble-tile.sz-lg { width: clamp(150px, 13vw, 200px); height: auto; }
+.noble-tile.sz-md { width: var(--noble-w, 108px); height: auto; }
+.noble-tile.sz-sm { width: 90px; height: auto; }
 .noble-vp {
-  font-size: 2.2rem;
+  font-size: clamp(1.2rem, 2vh, 2.2rem);
   font-weight: 800;
   color: #fff;
   align-self: flex-start;
@@ -214,48 +225,140 @@
 }
 
 .noble-req-num {
-  font-size: 1.3rem;
+  font-size: clamp(0.75rem, 1.3vh, 1.3rem);
   font-weight: 800;
   line-height: 1;
   color: #fff;
   text-shadow: 0 1px 2px rgba(0,0,0,0.8);
 }
 
-/* ─── Tablet portrait board scaling (2x) ─────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────
+ * Board scaling strategy
+ * ────────────────────────────────────────────────────────────────────────
+ * All board cards have a fixed 4:5 aspect-ratio and nobles a 1:1 ratio.
+ * We only tune a single width variable (--card-w / --noble-w) per layout
+ * mode, so cards never stretch and rows pack tightly with no dead space.
+ *
+ * Portrait: width-constrained. A tier row = 1 deck + 4 cards + 4 gaps.
+ *   card-w  ≈ (100vw - side_padding - 4*gap) / 5
+ * Landscape: height-constrained (nobles column + 3 tier rows fit vertically).
+ *   card-w  ≈ 0.8 * card-h, card-h ≈ (usable_h - 2*gap) / 3
+ *   Approximated with vh units below. */
+
+/* ─── Tablet portrait ───────────────────────────────────────────────────── */
 @media (orientation: portrait) and (min-width: 700px) {
-  .board-area .splendor-card.sz-md,
-  .board-area .deck-placeholder.sz-md {
-    width: 198px;
-    height: 249px;
+  .board-area {
+    /* Card sized by min(width-fit, height-fit) so the whole board fits without
+     * wasted side/vertical space. Width-fit: 5 items per row. Height-fit: card-h
+     * takes ~55% of viewport, so 3 tier rows + noble row fit under opponents/bank. */
+    --card-w-by-width: calc((100vw - 16px - 4 * var(--gap-sm)) / 5);
+    --card-w-by-height: calc((100dvh - 420px) / 3 * 0.8);
+    --card-w: min(var(--card-w-by-width), var(--card-w-by-height));
+    --noble-w: calc(var(--card-w) * 0.9);
   }
 
-  .board-area .noble-tile.sz-md {
-    width: 185px;
-    height: 198px;
+  .board-area .card-vp        { font-size: clamp(1.6rem, 3vw, 3rem); }
+  .board-area .card-bonus     { width: clamp(24px, 3.6vw, 44px); height: clamp(24px, 3.6vw, 44px); }
+  .board-area .card-cost-pip,
+  .board-area .splendor-card .card-cost-pip {
+    width: clamp(14px, 2.2vw, 28px);
+    height: clamp(14px, 2.2vw, 28px);
   }
+  .board-area .splendor-card .card-cost-row,
+  .board-area .cost-num,
+  .board-area .splendor-card .cost-num { font-size: clamp(0.9rem, 1.7vw, 1.7rem); }
+  .board-area .noble-vp       { font-size: clamp(1.3rem, 2.2vw, 2rem); }
+  .board-area .noble-req-num  { font-size: clamp(0.85rem, 1.4vw, 1.2rem); }
 }
 
-/* ─── Tablet landscape board scaling ─────────────────────────────────────── */
-@media (orientation: landscape) and (min-width: 900px) {
+/* ─── Phone portrait ────────────────────────────────────────────────────── */
+@media (orientation: portrait) and (max-width: 699px) {
+  .board-area {
+    /* Row-of-5 with 2px gaps (see board.css .tier-row gap override).
+     * Width-constrained; if board grows too tall for the viewport, the
+     * .game-center container scrolls vertically. */
+    --card-w: calc((100vw - 8px - 4 * 2px) / 5);
+    --noble-w: calc(var(--card-w) * 0.95);
+  }
+
+  .board-area .card-vp        { font-size: clamp(1rem, 3.2vw, 1.9rem); }
+  .board-area .card-bonus     { width: clamp(14px, 4vw, 26px); height: clamp(14px, 4vw, 26px); }
+  .board-area .card-cost-pip,
+  .board-area .splendor-card .card-cost-pip {
+    width: clamp(9px, 2.6vw, 17px);
+    height: clamp(9px, 2.6vw, 17px);
+  }
+  .board-area .splendor-card .card-cost-row,
+  .board-area .cost-num,
+  .board-area .splendor-card .cost-num { font-size: clamp(0.6rem, 2vw, 1rem); }
+  .board-area .noble-vp       { font-size: clamp(0.85rem, 2.6vw, 1.5rem); }
+  .board-area .noble-req-num  { font-size: clamp(0.55rem, 1.6vw, 0.95rem); }
+}
+
+/* ─── Phone landscape ───────────────────────────────────────────────────── */
+/*   Layout: nobles column + 3 tier rows in a horizontal grid, bank on right.
+ *   Board width per row = noble-col (~0.9·card-w) + 5 cards + gaps
+ *                       ≈ 5.9 · card-w + 15px.
+ *   Reserved horizontally: bank(~220) + gaps(~24) → 244.
+ *   So card-w ≤ (100vw − 244 − 15) / 5.9.
+ *   Reserved vertically: opponents(~40) + my-panel(≈80) + paddings(≈14) → 134.
+ *   card-h ≤ (100dvh − 134) / 3, and card-w = 0.8 · card-h. */
+@media (orientation: landscape) and (max-width: 899px) {
+  .board-area {
+    --card-w-by-h: calc(((100dvh - 134px) / 3) * 0.8);
+    --card-w-by-w: calc((100vw - 259px) / 5.9);
+    --card-w: min(var(--card-w-by-h), var(--card-w-by-w));
+    --card-h: calc(var(--card-w) / 0.8);
+    --noble-w: calc(var(--card-w) * 0.9);
+  }
+
   .board-area .splendor-card.sz-md,
-  .board-area .deck-placeholder.sz-md {
-    width: clamp(126px, 11.8vw, 206px);
-    height: clamp(160px, 15.3vw, 258px);
+  .board-area .deck-placeholder.sz-md { min-width: 42px; max-width: 130px; }
+  .board-area .noble-tile.sz-md      { min-width: 38px; max-width: 110px; }
+
+  .board-area .card-vp        { font-size: clamp(0.9rem, 3.2vh, 1.9rem); }
+  .board-area .card-bonus     { width: clamp(14px, 4vh, 26px); height: clamp(14px, 4vh, 26px); }
+  .board-area .card-cost-pip,
+  .board-area .splendor-card .card-cost-pip {
+    width: clamp(9px, 2.6vh, 17px);
+    height: clamp(9px, 2.6vh, 17px);
+  }
+  .board-area .splendor-card .card-cost-row,
+  .board-area .cost-num,
+  .board-area .splendor-card .cost-num { font-size: clamp(0.55rem, 2vh, 1rem); }
+  .board-area .noble-vp       { font-size: clamp(0.8rem, 2.6vh, 1.5rem); }
+  .board-area .noble-req-num  { font-size: clamp(0.55rem, 1.6vh, 0.95rem); }
+}
+
+/* ─── Tablet & desktop landscape ────────────────────────────────────────── */
+/*   Layout mirrors phone landscape: nobles column + 3 tier rows + bank right.
+ *   Reserved horizontally: bank(~260) + gaps(~40) → 300.
+ *   Reserved vertically: opponents(~60) + my-panel(~160) + paddings(~16) → 236. */
+@media (orientation: landscape) and (min-width: 900px) {
+  .board-area {
+    --card-w-by-h: calc(((100dvh - 236px) / 3) * 0.8);
+    --card-w-by-w: calc((100vw - 300px) / 5.9);
+    --card-w: min(var(--card-w-by-h), var(--card-w-by-w));
+    --card-h: calc(var(--card-w) / 0.8);
+    --noble-w: calc(var(--card-w) * 0.9);
   }
 
-  .board-area .noble-tile.sz-md {
-    width: clamp(108px, 8.2vw, 144px);
-    height: clamp(114px, 8.9vw, 154px);
-  }
+  .board-area .splendor-card.sz-md,
+  .board-area .deck-placeholder.sz-md { min-width: 110px; max-width: 240px; }
+  .board-area .noble-tile.sz-md      { min-width: 90px; max-width: 190px; }
 
-  .board-area .card-vp {
-    font-size: 2.4rem;
+  .board-area .card-vp        { font-size: clamp(1.3rem, 3.2vh, 2.6rem); }
+  .board-area .card-bonus     { width: clamp(22px, 4vh, 46px); height: clamp(22px, 4vh, 46px); }
+  .board-area .card-cost-pip,
+  .board-area .splendor-card .card-cost-pip {
+    width: clamp(14px, 2.6vh, 30px);
+    height: clamp(14px, 2.6vh, 30px);
   }
-
-  .board-area .card-bonus {
-    width: 34px;
-    height: 34px;
-  }
+  .board-area .splendor-card .card-cost-row,
+  .board-area .cost-num,
+  .board-area .splendor-card .cost-num { font-size: clamp(0.85rem, 2vh, 1.8rem); }
+  .board-area .noble-vp       { font-size: clamp(1.1rem, 2.6vh, 2.2rem); }
+  .board-area .noble-req-num  { font-size: clamp(0.75rem, 1.6vh, 1.3rem); }
 }
 
 /* ─── Modal card scaling (sz-lg inside .modal-box) ───────────────────────── */

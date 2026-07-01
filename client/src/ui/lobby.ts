@@ -94,6 +94,12 @@ function renderEntryScreen(): HTMLElement {
   return el;
 }
 
+const AI_CHARACTERS: Array<{ value: AiDifficulty; label: string }> = [
+  { value: 'easy',   label: 'Estaria (Easy)' },
+  { value: 'medium', label: 'Midarvy (Medium)' },
+  { value: 'hard',   label: 'Hadie (Hard)' },
+];
+
 function renderAiSlotsConfig(container: HTMLDivElement, total: number): void {
   // Slots 1…total-1 can optionally be AI (slot 0 is always the host)
   container.innerHTML = '';
@@ -111,18 +117,54 @@ function renderAiSlotsConfig(container: HTMLDivElement, total: number): void {
         AI player
       </label>
       <select data-ai-diff="${i}" class="diff-select" disabled>
-        <option value="easy">Easy</option>
-        <option value="medium" selected>Medium</option>
-        <option value="hard">Hard</option>
+        ${AI_CHARACTERS.map(c => `<option value="${c.value}">${c.label}</option>`).join('')}
       </select>
     `;
     const checkbox = row.querySelector<HTMLInputElement>(`[data-ai-slot="${i}"]`)!;
     const select = row.querySelector<HTMLSelectElement>(`[data-ai-diff="${i}"]`)!;
     checkbox.addEventListener('change', () => {
       select.disabled = !checkbox.checked;
+      if (checkbox.checked) enforceUniqueAiDifficulty(container, i, select);
+      else refreshAiDifficultyOptions(container);
     });
+    select.addEventListener('change', () => refreshAiDifficultyOptions(container));
     container.appendChild(row);
   }
+}
+
+/** Disable already-chosen difficulties across all active AI selects. */
+function refreshAiDifficultyOptions(container: HTMLDivElement): void {
+  const activeSelects: Array<HTMLSelectElement> = [];
+  const checkboxes = container.querySelectorAll<HTMLInputElement>('[data-ai-slot]');
+  for (const cb of checkboxes) {
+    if (cb.checked) {
+      const idx = cb.getAttribute('data-ai-slot')!;
+      const sel = container.querySelector<HTMLSelectElement>(`[data-ai-diff="${idx}"]`)!;
+      activeSelects.push(sel);
+    }
+  }
+  const chosenValues = activeSelects.map(s => s.value);
+  for (const sel of activeSelects) {
+    for (const opt of sel.options) {
+      opt.disabled = chosenValues.includes(opt.value) && opt.value !== sel.value;
+    }
+  }
+}
+
+/** After enabling a new AI slot, auto-pick the first unchosen difficulty. */
+function enforceUniqueAiDifficulty(container: HTMLDivElement, slotIndex: number, select: HTMLSelectElement): void {
+  const checkboxes = container.querySelectorAll<HTMLInputElement>('[data-ai-slot]');
+  const usedValues: string[] = [];
+  for (const cb of checkboxes) {
+    const idx = cb.getAttribute('data-ai-slot')!;
+    if (cb.checked && parseInt(idx, 10) !== slotIndex) {
+      const s = container.querySelector<HTMLSelectElement>(`[data-ai-diff="${idx}"]`)!;
+      usedValues.push(s.value);
+    }
+  }
+  const free = AI_CHARACTERS.find(c => !usedValues.includes(c.value));
+  if (free) select.value = free.value;
+  refreshAiDifficultyOptions(container);
 }
 
 function collectAiSlots(container: HTMLDivElement): Array<{ slotIndex: number; difficulty: AiDifficulty }> {
@@ -167,12 +209,19 @@ function renderWaitingRoom(room: ReturnType<typeof getState>['room'] & object): 
         </li>
       `).join('')}
     </ul>
-    ${isHost ? `<button id="start-btn" class="btn btn-primary" ${canStart ? '' : 'disabled'}>Start Game</button>` : '<p class="waiting-msg">Waiting for host to start…</p>'}
+    ${isHost ? `
+      <label class="random-start-toggle">
+        <input type="checkbox" id="random-start-cb" />
+        Random start order
+      </label>
+      <button id="start-btn" class="btn btn-primary" ${canStart ? '' : 'disabled'}>Start Game</button>
+    ` : '<p class="waiting-msg">Waiting for host to start…</p>'}
   `;
 
   if (isHost) {
     el.querySelector('#start-btn')!.addEventListener('click', () => {
-      send({ type: 'START_GAME', roomCode: room.roomCode });
+      const randomStart = (el.querySelector<HTMLInputElement>('#random-start-cb')?.checked) ?? false;
+      send({ type: 'START_GAME', roomCode: room.roomCode, randomStart });
     });
   }
 

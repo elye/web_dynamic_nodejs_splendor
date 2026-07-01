@@ -217,14 +217,46 @@ function renderGameScreen(state: AppState): void {
     const title = document.createElement('div');
     title.className = 'game-over-title';
     title.textContent = 'Game Over';
-    const winnersEl = document.createElement('div');
-    winnersEl.className = 'game-over-winners';
-    const winners = game.players.filter(p => game.winnerIds?.includes(p.id));
-    winnersEl.textContent = winners.length === 1
-      ? `🏆 ${winners[0].name} wins with ${winners[0].points} points!`
-      : `🏆 Tie: ${winners.map(w => w.name).join(' & ')}`;
     card.appendChild(title);
-    card.appendChild(winnersEl);
+
+    // Ranked leaderboard
+    const sorted = [...game.players].sort((a, b) => {
+      if (b.points !== a.points) return b.points - a.points;
+      // Tiebreak: fewer owned cards wins
+      return a.ownedCards.length - b.ownedCards.length;
+    });
+    const isWinner = (p: (typeof sorted)[number]) => game.winnerIds?.includes(p.id) ?? false;
+
+    const leaderboard = document.createElement('ol');
+    leaderboard.className = 'game-over-leaderboard';
+    sorted.forEach((p, idx) => {
+      const li = document.createElement('li');
+      li.className = 'leaderboard-row' + (isWinner(p) ? ' leaderboard-winner' : '');
+
+      const rankEl = document.createElement('span');
+      rankEl.className = 'lb-rank';
+      rankEl.textContent = isWinner(p) ? '🏆' : `#${idx + 1}`;
+
+      const nameEl = document.createElement('span');
+      nameEl.className = 'lb-name';
+      if (p.type === 'ai') {
+        const icon = document.createElement('span');
+        icon.textContent = '🤖';
+        icon.className = 'ai-icon';
+        nameEl.appendChild(icon);
+      }
+      nameEl.appendChild(document.createTextNode(p.name));
+
+      const ptsEl = document.createElement('span');
+      ptsEl.className = 'lb-pts';
+      ptsEl.textContent = `${p.points} pts`;
+
+      li.appendChild(rankEl);
+      li.appendChild(nameEl);
+      li.appendChild(ptsEl);
+      leaderboard.appendChild(li);
+    });
+    card.appendChild(leaderboard);
     overlay.appendChild(card);
     document.body.appendChild(overlay);
   }

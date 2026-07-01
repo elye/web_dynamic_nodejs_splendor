@@ -112,6 +112,7 @@ export interface MsgCreateRoom {
 export interface MsgStartGame {
   type: 'START_GAME';
   roomCode: string;
+  randomStart?: boolean;  // if true, randomise who goes first
 }
 
 export interface MsgTakeGems {

@@ -42,6 +42,7 @@ export interface InternalGameState extends GameState {
 
 export function createGame(
   players: Array<{ id: string; name: string; type: PlayerType; aiDifficulty?: AiDifficulty }>,
+  randomStart = false,
 ): InternalGameState {
   const playerCount = players.length;
   const gemCount = GEM_BANK_BY_PLAYER_COUNT[playerCount] ?? 4;
@@ -68,8 +69,11 @@ export function createGame(
   // Pick nobles
   const nobles = shuffle(ALL_NOBLES).slice(0, nobleCount);
 
+  // Optionally randomise turn order
+  const orderedPlayers = randomStart ? shuffle(players) : players;
+
   // Build player states
-  const playerStates: PlayerState[] = players.map(p => ({
+  const playerStates: PlayerState[] = orderedPlayers.map(p => ({
     id: p.id,
     name: p.name,
     type: p.type,
