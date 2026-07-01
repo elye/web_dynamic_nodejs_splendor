@@ -142,6 +142,13 @@ export interface MsgChooseNoble {
   nobleId: string;
 }
 
+export interface MsgReconnectRoom {
+  type: 'RECONNECT_ROOM';
+  roomCode: string;
+  playerId: string;
+  playerName: string;
+}
+
 export type ClientMessage =
   | MsgJoinRoom
   | MsgCreateRoom
@@ -150,7 +157,8 @@ export type ClientMessage =
   | MsgBuyCard
   | MsgReserveCard
   | MsgDiscardGems
-  | MsgChooseNoble;
+  | MsgChooseNoble
+  | MsgReconnectRoom;
 
 // ─── Server → Client messages ─────────────────────────────────────────────────
 

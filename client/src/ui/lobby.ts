@@ -1,6 +1,6 @@
 import type { AiDifficulty } from '@splendor/shared';
 import { send } from '../ws-client.js';
-import { getState } from '../state.js';
+import { getState, setPlayerName } from '../state.js';
 
 // ─── Lobby render ─────────────────────────────────────────────────────────────
 
@@ -71,11 +71,19 @@ function renderEntryScreen(): HTMLElement {
   totalSlotsSelect.addEventListener('change', refreshAiConfig);
   refreshAiConfig();
 
+  // Pre-fill the join code if the URL has a ?room= param (e.g., someone shared a link)
+  const urlCode = new URLSearchParams(location.search).get('room')?.toUpperCase() ?? '';
+  if (urlCode.length === 4) {
+    const joinCodeInput = el.querySelector<HTMLInputElement>('#join-code');
+    if (joinCodeInput) joinCodeInput.value = urlCode;
+  }
+
   el.querySelector('#create-btn')!.addEventListener('click', () => {
     const name = (el.querySelector<HTMLInputElement>('#create-name')!.value).trim();
     if (!name) return;
     const total = parseInt(totalSlotsSelect.value, 10);
     const aiSlots = collectAiSlots(aiSlotsConfig);
+    setPlayerName(name);
     send({ type: 'CREATE_ROOM', playerName: name, totalSlots: total, aiSlots });
   });
 
@@ -88,6 +96,7 @@ function renderEntryScreen(): HTMLElement {
       return;
     }
     errEl.textContent = '';
+    setPlayerName(name);
     send({ type: 'JOIN_ROOM', roomCode: code, playerName: name });
   });
 

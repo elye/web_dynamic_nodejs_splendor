@@ -4,9 +4,9 @@ import './styles/cards.css';
 import './styles/board.css';
 import './styles/panels.css';
 
-import { connect, onMessage, send } from './ws-client.js';
+import { connect, onMessage, send, waitForOpen } from './ws-client.js';
 import { startKeepAlive, stopKeepAlive } from './keep-alive.js';
-import { setPlayerId, setRoom, setGame, getState, subscribe } from './state.js';
+import { setPlayerId, setPlayerName, setRoom, setGame, getState, subscribe, saveSession, loadSession, clearSession, resetToLobby } from './state.js';
 import type { AppState } from './state.js';
 import { renderLobby } from './ui/lobby.js';
 import { renderBoard, renderBankPanel } from './ui/board.js';
@@ -32,12 +32,67 @@ document.addEventListener('fullscreenchange', () => {
 
 connect();
 
+// ─── Auto-reconnect on page load ─────────────────────────────────────────────
+
+const urlRoomCode = new URLSearchParams(location.search).get('room')?.toUpperCase() ?? null;
+const savedSession = loadSession();
+
+// If the URL contains a room code and we have a saved session for that room,
+// send RECONNECT_ROOM once the WebSocket is open.
+if (urlRoomCode && savedSession && savedSession.roomCode === urlRoomCode) {
+  // Wait for the socket 'open' event then send the reconnect message
+  const tryReconnect = (): void => {
+    send({ type: 'RECONNECT_ROOM', roomCode: urlRoomCode, playerId: savedSession.playerId, playerName: savedSession.playerName });
+  };
+  // onMessage fires synchronously for YOUR_ID right after open; we hook into
+  // a small helper that fires once the socket is confirmed open.
+  waitForOpen(tryReconnect);
+}
+
 onMessage((msg) => {
   switch (msg.type) {
-    case 'YOUR_ID':    setPlayerId(msg.playerId); break;
-    case 'ROOM_UPDATE': setRoom(msg.room); break;
+    case 'YOUR_ID': {
+      setPlayerId(msg.playerId);
+      // Restore player name from session (needed so ROOM_UPDATE can call saveSession)
+      const sess = loadSession();
+      if (sess && msg.playerId === sess.playerId) {
+        setPlayerName(sess.playerName);
+      }
+      break;
+    }
+    case 'ROOM_UPDATE': {
+      setRoom(msg.room);
+      // Push the room code into the URL (idempotent if already there)
+      const code = msg.room.roomCode;
+      const current = new URLSearchParams(location.search).get('room')?.toUpperCase();
+      if (current !== code) {
+        const url = new URL(location.href);
+        url.searchParams.set('room', code);
+        history.replaceState(null, '', url.toString());
+      }
+      // Persist the session so a refresh can reconnect
+      const s = getState();
+      if (s.myPlayerId && s.myPlayerName) {
+        saveSession(s.myPlayerId, s.myPlayerName, code);
+      }
+      break;
+    }
     case 'GAME_STATE': {
       setGame(msg.state);
+      // Keep session fresh with the latest room code from game state
+      {
+        const s = getState();
+        if (s.myPlayerId && s.myPlayerName && msg.state.roomCode) {
+          saveSession(s.myPlayerId, s.myPlayerName, msg.state.roomCode);
+          // Keep URL in sync too
+          const current = new URLSearchParams(location.search).get('room')?.toUpperCase();
+          if (current !== msg.state.roomCode) {
+            const url = new URL(location.href);
+            url.searchParams.set('room', msg.state.roomCode);
+            history.replaceState(null, '', url.toString());
+          }
+        }
+      }
       // If there's a pending discard/noble choice for the local player, show modal.
       const { myPlayerId } = getState();
       const discard = msg.state.pendingDiscard;
@@ -67,6 +122,14 @@ function render(state: AppState): void {
     removeFullscreenToggle();
     void exitFullscreenIfNeeded();
     lastTurnToastKey = null;
+    // If we reach the entry screen (no room), clear session + URL so a refresh
+    // doesn't try to reconnect to a gone room.
+    if (!state.room) {
+      clearSession();
+      if (location.search) {
+        history.replaceState(null, '', location.pathname);
+      }
+    }
     app.innerHTML = '';
     app.className = '';
     const lobbyEl = document.createElement('div');
@@ -257,6 +320,14 @@ function renderGameScreen(state: AppState): void {
       leaderboard.appendChild(li);
     });
     card.appendChild(leaderboard);
+
+    const newGameBtn = document.createElement('button');
+    newGameBtn.type = 'button';
+    newGameBtn.className = 'btn btn-primary game-over-new-game-btn';
+    newGameBtn.textContent = '🏠 New Game';
+    newGameBtn.addEventListener('click', () => goToLobby());
+    card.appendChild(newGameBtn);
+
     overlay.appendChild(card);
     document.body.appendChild(overlay);
   }
@@ -272,6 +343,18 @@ function renderGameScreen(state: AppState): void {
     const isTurn = game.players.indexOf(opp) === game.currentPlayerIndex;
     opponentsBar.appendChild(renderOpponentStrip(opp, isTurn));
   }
+  const leaveBtn = document.createElement('button');
+  leaveBtn.type = 'button';
+  leaveBtn.className = 'btn btn-danger leave-game-btn';
+  leaveBtn.textContent = '✕ Leave';
+  leaveBtn.title = 'Leave game and return to lobby';
+  leaveBtn.addEventListener('click', () => {
+    if (game.phase === 'finished' || confirm('Leave the current game and return to the lobby?')) {
+      goToLobby();
+    }
+  });
+  opponentsBar.appendChild(leaveBtn);
+
   const fsBtn = document.createElement('button');
   fsBtn.type = 'button';
   fsBtn.className = 'btn btn-secondary fullscreen-toggle-btn';
@@ -422,5 +505,16 @@ async function exitFullscreenIfNeeded(): Promise<void> {
   } catch (err) {
     console.warn('[fullscreen] exit failed', err);
   }
+}
+
+// ─── Leave / lobby helpers ────────────────────────────────────────────────────
+
+function goToLobby(): void {
+  clearSession();
+  if (location.search) history.replaceState(null, '', location.pathname);
+  void exitFullscreenIfNeeded();
+  // Remove any lingering game-over overlay
+  document.querySelector('.game-over-overlay')?.remove();
+  resetToLobby();
 }
 
