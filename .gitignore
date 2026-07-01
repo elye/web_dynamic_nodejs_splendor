@@ -10,9 +10,18 @@ shared/dist/
 # TypeScript
 *.tsbuildinfo
 **/*.tsbuildinfo
-**/*.js
-**/*.d.ts
-**/*.d.ts.map
+**/dist/**/*.js
+**/dist/**/*.d.ts
+**/dist/**/*.d.ts.map
+shared/src/*.js
+shared/src/*.d.ts
+shared/src/*.d.ts.map
+server/src/game-engine/*.js
+server/src/game-engine/*.d.ts
+server/src/game-engine/*.d.ts.map
+server/src/ai/*.js
+server/src/ai/*.d.ts
+server/src/ai/*.d.ts.map
 !vite.config.ts
 !tsconfig*.json
 
