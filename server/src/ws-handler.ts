@@ -8,6 +8,7 @@ import {
   joinRoom,
   startGame,
   disconnectPlayer,
+  reconnectPlayer,
   getRoomInfo,
   broadcastToRoom,
   sendToPlayer,
@@ -101,6 +102,40 @@ async function handleMessage(socket: WebSocket, msg: ClientMessage): Promise<voi
       }
       state.roomCode = room.code;
       broadcastToRoom(room, { type: 'ROOM_UPDATE', room: getRoomInfo(room) });
+      break;
+    }
+
+    case 'RECONNECT_ROOM': {
+      const room = getRoom(msg.roomCode.toUpperCase());
+      if (!room) {
+        send(socket, { type: 'ERROR', code: 'ROOM_NOT_FOUND', message: 'Room not found' });
+        return;
+      }
+
+      // Check if this playerId already has a slot in the room
+      const existingSlot = room.slots.find(s => s.playerId === msg.playerId);
+      if (!existingSlot) {
+        // Player ID not in this room — try joining as a new player (lobby only)
+        const joinResult = joinRoom(room, msg.playerId, msg.playerName, socket);
+        if (!joinResult.ok) {
+          send(socket, { type: 'ERROR', code: 'JOIN_FAILED', message: joinResult.error });
+          return;
+        }
+      } else {
+        // Reconnect the known player
+        reconnectPlayer(room, msg.playerId, socket);
+        existingSlot.playerName = msg.playerName;
+      }
+
+      // Override the server-assigned playerId with the saved one
+      state.playerId = msg.playerId;
+      state.roomCode = room.code;
+
+      send(socket, { type: 'YOUR_ID', playerId: msg.playerId });
+      broadcastToRoom(room, { type: 'ROOM_UPDATE', room: getRoomInfo(room) });
+      if (room.game) {
+        broadcastGameState(room);
+      }
       break;
     }
 

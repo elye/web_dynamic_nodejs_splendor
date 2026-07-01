@@ -4,6 +4,7 @@ import type { GameState, RoomInfo } from '@splendor/shared';
 
 export interface AppState {
   myPlayerId: string | null;
+  myPlayerName: string | null;
   room: RoomInfo | null;
   game: GameState | null;
   screen: 'lobby' | 'game';
@@ -11,10 +12,39 @@ export interface AppState {
 
 const state: AppState = {
   myPlayerId: null,
+  myPlayerName: null,
   room: null,
   game: null,
   screen: 'lobby',
 };
+
+// ─── Session persistence ──────────────────────────────────────────────────────
+
+const SESSION_KEY = 'splendor_session';
+
+interface PersistedSession {
+  playerId: string;
+  playerName: string;
+  roomCode: string;
+}
+
+export function saveSession(playerId: string, playerName: string, roomCode: string): void {
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ playerId, playerName, roomCode }));
+}
+
+export function loadSession(): PersistedSession | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as PersistedSession;
+  } catch {
+    return null;
+  }
+}
+
+export function clearSession(): void {
+  sessionStorage.removeItem(SESSION_KEY);
+}
 
 // ─── Subscribers ──────────────────────────────────────────────────────────────
 
@@ -44,6 +74,11 @@ export function setPlayerId(id: string): void {
   notify();
 }
 
+export function setPlayerName(name: string): void {
+  state.myPlayerName = name;
+  notify();
+}
+
 export function setRoom(room: RoomInfo): void {
   state.room = room;
   if (room.phase === 'playing' || room.phase === 'finished') {
@@ -60,5 +95,12 @@ export function setGame(game: GameState): void {
 
 export function setScreen(screen: AppState['screen']): void {
   state.screen = screen;
+  notify();
+}
+
+export function resetToLobby(): void {
+  state.room = null;
+  state.game = null;
+  state.screen = 'lobby';
   notify();
 }

@@ -8,6 +8,17 @@ let socket: WebSocket | null = null;
 const handlers: MessageHandler[] = [];
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
+// Callbacks to run once the socket becomes open
+const openCallbacks: Array<() => void> = [];
+
+export function waitForOpen(cb: () => void): void {
+  if (socket?.readyState === WebSocket.OPEN) {
+    cb();
+  } else {
+    openCallbacks.push(cb);
+  }
+}
+
 export function connect(): void {
   if (socket) return;
   _connect();
@@ -21,6 +32,10 @@ function _connect(): void {
     if (reconnectTimer) {
       clearTimeout(reconnectTimer);
       reconnectTimer = null;
+    }
+    // Fire any queued open callbacks
+    while (openCallbacks.length > 0) {
+      openCallbacks.shift()!();
     }
   });
 
