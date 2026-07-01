@@ -33,7 +33,7 @@
 
 /* ─── Sizes ──────────────────────────────────────────────────────────────── */
 .splendor-card.sz-lg { width: clamp(180px, 17vw, 260px); height: clamp(225px, 21vw, 325px); }
-.splendor-card.sz-md { width: 198px; height: 248px; }
+.splendor-card.sz-md { width: clamp(148px, 14vw, 210px); height: calc((100dvh - 280px - 3 * var(--gap-sm)) / 4); min-height: 140px; max-height: 280px; }
 .splendor-card.sz-sm { width: 144px; height: 185px; }
 .splendor-card.sz-xs { width: 104px; height: 131px; }
 
@@ -52,18 +52,18 @@
 }
 
 .card-vp {
-  font-size: 3.3rem;
+  font-size: clamp(1.8rem, 3.2vh, 3.3rem);
   font-weight: 800;
   line-height: 1;
-  min-width: 48px;
+  min-width: clamp(28px, 4vh, 48px);
   color: #fff;
   text-shadow: 0 1px 2px rgba(0,0,0,0.6);
 }
 .card-vp.zero { opacity: 0; }   /* hide VP=0 */
 
 .card-bonus {
-  width: 48px;
-  height: 48px;
+  width: clamp(26px, 4.2vh, 48px);
+  height: clamp(26px, 4.2vh, 48px);
   border-radius: 50%;
   border: 2px solid #f2d36a;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.35);
@@ -102,7 +102,7 @@
 }
 
 .splendor-card .card-cost-row {
-  font-size: 1.8rem;
+  font-size: clamp(1rem, 1.6vh, 1.8rem);
 }
 
 .card-cost-pip {
@@ -115,8 +115,8 @@
 }
 
 .splendor-card .card-cost-pip {
-  width: 30px;
-  height: 30px;
+  width: clamp(16px, 2.6vh, 30px);
+  height: clamp(16px, 2.6vh, 30px);
 }
 .card-cost-pip.white { background: radial-gradient(circle at 40% 35%, #fff 0%, #c9c4ae 100%); }
 .card-cost-pip.blue  { background: radial-gradient(circle at 40% 35%, #7bc8ec 0%, #2d7aab 100%); }
@@ -137,8 +137,8 @@
 }
 
 .splendor-card .cost-num {
-  min-width: 26px;
-  font-size: 1.88rem;
+  min-width: clamp(14px, 2.4vh, 26px);
+  font-size: clamp(1rem, 1.7vh, 1.88rem);
 }
 .tier-3 .cost-num {
   color: #fff;
@@ -161,7 +161,7 @@
 .deck-placeholder.tier-1 { border-color: var(--tier1-border); color: var(--tier1-border); background: rgba(232,223,200,0.08); }
 .deck-placeholder.tier-2 { border-color: var(--tier2-border); color: var(--tier2-border); background: rgba(247,224,122,0.08); }
 .deck-placeholder.tier-3 { border-color: #4a5a9e; color: #8898d8; background: rgba(42,58,110,0.3); }
-.deck-placeholder.sz-md  { width: 198px; height: 248px; }
+.deck-placeholder.sz-md  { width: clamp(148px, 14vw, 210px); height: calc((100dvh - 280px - 3 * var(--gap-sm)) / 4); min-height: 140px; max-height: 280px; }
 .deck-placeholder.sz-sm  { width: 144px; height: 185px; }
 
 .deck-count {
@@ -186,10 +186,10 @@
   flex-shrink: 0;
 }
 .noble-tile.sz-lg { width: clamp(150px, 13vw, 200px); height: clamp(162px, 14vw, 216px); }
-.noble-tile.sz-md { width: 123px; height: 132px; }
+.noble-tile.sz-md { width: clamp(100px, 10vw, 160px); height: calc((100dvh - 280px - 3 * var(--gap-sm)) / 4); min-height: 100px; max-height: 280px; }
 .noble-tile.sz-sm { width: 90px; height: 99px; }
 .noble-vp {
-  font-size: 2.2rem;
+  font-size: clamp(1.2rem, 2vh, 2.2rem);
   font-weight: 800;
   color: #fff;
   align-self: flex-start;
@@ -214,24 +214,139 @@
 }
 
 .noble-req-num {
-  font-size: 1.3rem;
+  font-size: clamp(0.75rem, 1.3vh, 1.3rem);
   font-weight: 800;
   line-height: 1;
   color: #fff;
   text-shadow: 0 1px 2px rgba(0,0,0,0.8);
 }
 
-/* ─── Tablet portrait board scaling (2x) ─────────────────────────────────── */
+/* ─── Tablet portrait board scaling ─────────────────────────────────────── */
 @media (orientation: portrait) and (min-width: 700px) {
   .board-area .splendor-card.sz-md,
   .board-area .deck-placeholder.sz-md {
-    width: 198px;
-    height: 249px;
+    width: clamp(120px, 17vw, 210px);
+    height: clamp(152px, 21.5vw, 264px);
   }
 
   .board-area .noble-tile.sz-md {
-    width: 185px;
-    height: 198px;
+    width: clamp(100px, 13vw, 196px);
+    height: clamp(108px, 14vw, 210px);
+  }
+
+  .board-area .card-vp {
+    font-size: clamp(1.8rem, 3vw, 3.3rem);
+  }
+
+  .board-area .card-bonus {
+    width: clamp(28px, 4vw, 48px);
+    height: clamp(28px, 4vw, 48px);
+  }
+
+  .board-area .card-cost-pip,
+  .board-area .splendor-card .card-cost-pip {
+    width: clamp(16px, 2.4vw, 30px);
+    height: clamp(16px, 2.4vw, 30px);
+  }
+
+  .board-area .splendor-card .card-cost-row,
+  .board-area .cost-num,
+  .board-area .splendor-card .cost-num {
+    font-size: clamp(1rem, 1.8vw, 1.88rem);
+  }
+
+  .board-area .noble-vp {
+    font-size: clamp(1.4rem, 2.2vw, 2.2rem);
+  }
+
+  .board-area .noble-req-num {
+    font-size: clamp(0.9rem, 1.4vw, 1.3rem);
+  }
+}
+
+/* ─── Phone portrait board scaling ──────────────────────────────────────── */
+@media (orientation: portrait) and (max-width: 699px) {
+  .board-area .splendor-card.sz-md,
+  .board-area .deck-placeholder.sz-md {
+    width: clamp(72px, 17.5vw, 120px);
+    height: clamp(92px, 22vw, 152px);
+  }
+
+  .board-area .noble-tile.sz-md {
+    width: clamp(62px, 14vw, 100px);
+    height: clamp(68px, 15.5vw, 108px);
+  }
+
+  .board-area .card-vp {
+    font-size: clamp(1.1rem, 2.8vw, 2rem);
+  }
+
+  .board-area .card-bonus {
+    width: clamp(16px, 4vw, 28px);
+    height: clamp(16px, 4vw, 28px);
+  }
+
+  .board-area .card-cost-pip,
+  .board-area .splendor-card .card-cost-pip {
+    width: clamp(10px, 2.5vw, 18px);
+    height: clamp(10px, 2.5vw, 18px);
+  }
+
+  .board-area .splendor-card .card-cost-row,
+  .board-area .cost-num,
+  .board-area .splendor-card .cost-num {
+    font-size: clamp(0.65rem, 1.8vw, 1.1rem);
+  }
+
+  .board-area .noble-vp {
+    font-size: clamp(0.9rem, 2.5vw, 1.6rem);
+  }
+
+  .board-area .noble-req-num {
+    font-size: clamp(0.6rem, 1.6vw, 1rem);
+  }
+}
+
+/* ─── Phone landscape board scaling ─────────────────────────────────────── */
+@media (orientation: landscape) and (max-width: 899px) {
+  .board-area .splendor-card.sz-md,
+  .board-area .deck-placeholder.sz-md {
+    width: clamp(72px, 12vw, 126px);
+    height: clamp(92px, 15vw, 160px);
+  }
+
+  .board-area .noble-tile.sz-md {
+    width: clamp(60px, 8.5vw, 108px);
+    height: clamp(66px, 9.5vw, 114px);
+  }
+
+  .board-area .card-vp {
+    font-size: clamp(1rem, 2.2vw, 2rem);
+  }
+
+  .board-area .card-bonus {
+    width: clamp(16px, 3vw, 28px);
+    height: clamp(16px, 3vw, 28px);
+  }
+
+  .board-area .card-cost-pip,
+  .board-area .splendor-card .card-cost-pip {
+    width: clamp(10px, 2vw, 18px);
+    height: clamp(10px, 2vw, 18px);
+  }
+
+  .board-area .splendor-card .card-cost-row,
+  .board-area .cost-num,
+  .board-area .splendor-card .cost-num {
+    font-size: clamp(0.6rem, 1.5vw, 1.1rem);
+  }
+
+  .board-area .noble-vp {
+    font-size: clamp(0.85rem, 2vw, 1.6rem);
+  }
+
+  .board-area .noble-req-num {
+    font-size: clamp(0.55rem, 1.2vw, 0.95rem);
   }
 }
 
@@ -239,22 +354,42 @@
 @media (orientation: landscape) and (min-width: 900px) {
   .board-area .splendor-card.sz-md,
   .board-area .deck-placeholder.sz-md {
-    width: clamp(126px, 11.8vw, 206px);
-    height: clamp(160px, 15.3vw, 258px);
+    width: clamp(100px, 10.5vw, 218px);
+    height: clamp(128px, 13.5vw, 274px);
   }
 
   .board-area .noble-tile.sz-md {
-    width: clamp(108px, 8.2vw, 144px);
-    height: clamp(114px, 8.9vw, 154px);
+    width: clamp(86px, 7.5vw, 152px);
+    height: clamp(92px, 8.2vw, 164px);
   }
 
   .board-area .card-vp {
-    font-size: 2.4rem;
+    font-size: clamp(1.4rem, 2vw, 2.4rem);
   }
 
   .board-area .card-bonus {
-    width: 34px;
-    height: 34px;
+    width: clamp(24px, 3vw, 42px);
+    height: clamp(24px, 3vw, 42px);
+  }
+
+  .board-area .card-cost-pip,
+  .board-area .splendor-card .card-cost-pip {
+    width: clamp(16px, 2vw, 28px);
+    height: clamp(16px, 2vw, 28px);
+  }
+
+  .board-area .splendor-card .card-cost-row,
+  .board-area .cost-num,
+  .board-area .splendor-card .cost-num {
+    font-size: clamp(0.85rem, 1.5vw, 1.88rem);
+  }
+
+  .board-area .noble-vp {
+    font-size: clamp(1.2rem, 1.8vw, 2.2rem);
+  }
+
+  .board-area .noble-req-num {
+    font-size: clamp(0.75rem, 1.1vw, 1.3rem);
   }
 }
 

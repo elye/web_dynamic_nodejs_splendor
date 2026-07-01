@@ -190,8 +190,8 @@
 
 @media (orientation: landscape) and (min-width: 900px) {
   .opponent-strip {
-    min-height: 57px;
-    padding: 6px 10px;
+    min-height: clamp(44px, 7vh, 57px);
+    padding: clamp(3px, 0.8vh, 6px) 10px;
     gap: 6px;
   }
 
@@ -247,12 +247,12 @@
   }
 
   .my-points-badge {
-    font-size: 2.25rem;
+    font-size: clamp(1.5rem, 2.8vh, 2.25rem);
   }
 
   .my-turn-label {
-    font-size: 1.38rem;
-    padding: 9px 18px;
+    font-size: clamp(1rem, 1.6vh, 1.38rem);
+    padding: clamp(5px, 1vh, 9px) 18px;
   }
 
   .my-gems-grid {
@@ -269,9 +269,9 @@
   }
 
   .my-panel .gem-token.sz-sm {
-    width: 42px;
-    height: 42px;
-    font-size: 1.2rem;
+    width: clamp(28px, 4.5vh, 42px);
+    height: clamp(28px, 4.5vh, 42px);
+    font-size: clamp(0.8rem, 1.4vh, 1.2rem);
   }
 
   .my-gem-count {
@@ -288,8 +288,8 @@
   }
 
   .my-bonus-chip {
-    font-size: 1.29rem;
-    padding: 6px 14px;
+    font-size: clamp(0.9rem, 1.5vh, 1.29rem);
+    padding: clamp(3px, 0.8vh, 6px) 10px;
     border-radius: 9px;
   }
 }
