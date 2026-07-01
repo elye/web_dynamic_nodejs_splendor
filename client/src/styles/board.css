@@ -271,28 +271,54 @@
 
   .bank-row-primary,
   .bank-row-secondary {
-    justify-content: flex-start;
+    justify-content: space-between;
+    align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
   }
 
+  /* Gems in a single row of 5 that always fits available width. */
   .bank-select-gems {
-    gap: 10px;
-    flex-wrap: nowrap;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .bank-gem-item {
+    justify-content: center;
+    min-height: 40px;
+    gap: 4px;
   }
 
   .bank-panel .gem-token.sz-md {
-    width: 36px;
-    height: 36px;
-    font-size: 0.85rem;
+    width: 34px;
+    height: 34px;
+    font-size: 0.8rem;
+  }
+
+  .bank-gem-multi {
+    min-width: 22px;
+    padding: 1px 4px;
+    font-size: 0.65rem;
   }
 
   .bank-gem-label {
     font-size: 0.7rem;
   }
 
+  .bank-actions .btn {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+
   .bank-selection-hint {
-    min-height: 40px;
+    flex: 1 1 100%;
+    min-height: 36px;
     font-size: 0.62rem;
+    padding: 6px 8px;
+    line-height: 1.25;
   }
 
   .my-panel-bar {
@@ -411,14 +437,22 @@
 @media (orientation: landscape) and (max-width: 899px) {
   .opponents-bar {
     padding: 2px 6px;
+    min-height: 0;
+    gap: 4px;
+  }
+
+  .opponent-strip {
+    min-height: 34px;
+    padding: 3px 6px;
   }
 
   .game-center {
-    gap: 8px;
-    padding: 0 4px;
-    align-items: stretch;
+    gap: 6px;
+    padding: 2px 4px;
+    align-items: center;
     justify-content: center;
     overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .board-area {
@@ -458,22 +492,27 @@
   }
 
   .my-panel-bar {
-    max-height: 140px;
-    padding: 4px 6px;
+    max-height: clamp(58px, 20vh, 110px);
+    padding: 2px 6px;
   }
 
   .bank-panel {
-    width: clamp(150px, 20vw, 220px);
-    gap: 4px;
-    padding: 4px;
+    /* Uses whatever horizontal space the board leaves over. */
+    width: clamp(150px, 32vw, 260px);
+    gap: 3px;
+    padding: 4px 6px;
     align-self: center;
     align-items: stretch;
+    max-height: calc(100dvh - 8px);
+    overflow-y: auto;
   }
 
+  .bank-title { font-size: 0.62rem; }
+
   .bank-panel .gem-token.sz-md {
-    width: 32px;
-    height: 32px;
-    font-size: 0.78rem;
+    width: 28px;
+    height: 28px;
+    font-size: 0.72rem;
   }
 
   .bank-row-primary,
@@ -481,35 +520,51 @@
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
-    gap: 8px;
+    gap: 4px;
   }
 
+  /* Fit all 5 select gems + gold reserve into 2 rows to save vertical space. */
   .bank-select-gems {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px 6px;
   }
 
   .bank-gem-item {
-    min-height: 36px;
+    min-height: 30px;
+    gap: 4px;
+  }
+
+  .bank-gem-multi {
+    min-width: 22px;
+    padding: 1px 4px;
+    font-size: 0.65rem;
   }
 
   .bank-gem-label {
-    font-size: 0.68rem;
+    font-size: 0.62rem;
+  }
+
+  .bank-reserve-info { gap: 6px; }
+
+  .bank-actions .btn {
+    padding: 4px 8px;
+    font-size: 0.72rem;
   }
 
   .bank-selection-hint {
     display: block;
     width: 100%;
     height: auto;
-    min-height: 36px;
-    padding: 4px;
-    font-size: 0.58rem;
-    line-height: 1.2;
+    min-height: 30px;
+    padding: 3px 4px;
+    font-size: 0.55rem;
+    line-height: 1.15;
   }
 
   .bank-actions {
     width: 100%;
     justify-content: flex-start;
+    gap: 4px;
   }
 }
