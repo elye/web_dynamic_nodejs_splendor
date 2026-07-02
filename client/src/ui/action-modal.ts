@@ -1,6 +1,6 @@
-import type { Card, Noble, GemColor, GemColorOrGold, CardTier, GemPool, PlayerState } from '@splendor/shared';
+import type { Card, Noble, CardTier, PlayerState } from '@splendor/shared';
 import { GEM_COLORS } from '@splendor/shared';
-import { renderCard, renderGemToken, renderNobleTile } from './card.js';
+import { renderCard, renderNobleTile } from './card.js';
 import { send } from '../ws-client.js';
 
 // ─── Modal host ───────────────────────────────────────────────────────────────
@@ -18,9 +18,6 @@ function openModal(content: HTMLElement, dismissOnOutsideClick = true): void {
   }
   const box = document.createElement('div');
   box.className = 'modal-box';
-  if (content.classList.contains('discard-modal')) {
-    box.classList.add('modal-box-discard');
-  }
   box.appendChild(content);
   modalOverlay.appendChild(box);
   document.body.appendChild(modalOverlay);
@@ -123,180 +120,6 @@ export function openDeckReserveModal(tier: CardTier, myPlayer: PlayerState): voi
   openModal(frag);
 }
 
-// ─── Gem selection modal ──────────────────────────────────────────────────────
-
-export function openGemPickerModal(
-  bankGems: GemPool,
-  initialColor: GemColorOrGold,
-): void {
-  const selected = new Map<GemColor, number>();
-  let element: HTMLElement;
-
-  function rebuild(): void {
-    element.innerHTML = '';
-    renderGemPicker(element, bankGems, selected, rebuild, submitGems);
-  }
-
-  element = document.createElement('div');
-  element.className = 'gem-picker-modal';
-
-  // Add initial colour selection
-  if (initialColor !== 'gold' && GEM_COLORS.includes(initialColor as GemColor)) {
-    selected.set(initialColor as GemColor, 1);
-  }
-
-  rebuild();
-  openModal(element);
-}
-
-function gemPickerHint(selected: Map<GemColor, number>, bank: GemPool): string {
-  const total = [...selected.values()].reduce((a, b) => a + b, 0);
-  const isDouble = selected.size === 1 && total === 2;
-
-  if (total === 0) return 'Select up to 3 different colours, or 2 of the same (pile ≥ 4)';
-  if (isDouble) return 'Taking 2 of the same colour — confirm or deselect to change';
-  if (total === 3) return 'Maximum 3 gems selected — confirm or deselect to change';
-  if (total === 2) return `${3 - total} more different colour available, or confirm`;
-  return `${3 - total} more different colours available, or confirm`;
-}
-
-/** Returns true if clicking this unselected colour would be a valid addition. */
-function canAddColor(color: GemColor, selected: Map<GemColor, number>, bank: GemPool): boolean {
-  const total = [...selected.values()].reduce((a, b) => a + b, 0);
-  const bankCount = bank[color] ?? 0;
-  if (bankCount === 0) return false;
-  // Already have a double — no more picks allowed
-  if (selected.size === 1 && total === 2) return false;
-  // Already at 3 gems total
-  if (total >= 3) return false;
-  return true;
-}
-
-function renderGemPicker(
-  container: HTMLElement,
-  bank: GemPool,
-  selected: Map<GemColor, number>,
-  onChange: () => void,
-  onConfirm: (sel: Map<GemColor, number>) => void,
-): void {
-  const title = document.createElement('h3');
-  title.textContent = 'Take Gems';
-  container.appendChild(title);
-
-  const hint = document.createElement('p');
-  hint.className = 'picker-hint';
-  hint.textContent = gemPickerHint(selected, bank);
-  container.appendChild(hint);
-
-  const grid = document.createElement('div');
-  grid.className = 'picker-grid';
-
-  for (const color of GEM_COLORS) {
-    const count = bank[color] ?? 0;
-    const sel = selected.get(color) ?? 0;
-    const isSelected = sel > 0;
-
-    // A token is interactive if it's already selected (click deselects)
-    // or if adding it would be valid
-    const interactive = isSelected || canAddColor(color, selected, bank);
-
-    const col = document.createElement('div');
-    col.className = 'picker-col';
-
-    const token = renderGemToken(color, undefined, 'sz-xl', {
-      clickable: interactive,
-      selected: isSelected,
-      disabled: !interactive,
-      onClick: () => {
-        toggleGemSelection(selected, color, bank, onChange);
-      },
-    });
-    col.appendChild(token);
-
-    const info = document.createElement('div');
-    info.className = 'picker-info';
-    info.textContent = `${count} avail${sel > 0 ? ` (−${sel})` : ''}`;
-    col.appendChild(info);
-
-    grid.appendChild(col);
-  }
-
-  container.appendChild(grid);
-
-  const actions = document.createElement('div');
-  actions.className = 'modal-actions';
-
-  const confirmBtn = document.createElement('button');
-  confirmBtn.className = 'btn btn-primary';
-  confirmBtn.textContent = 'Confirm';
-  confirmBtn.disabled = selected.size === 0;
-  confirmBtn.addEventListener('click', () => onConfirm(selected));
-  actions.appendChild(confirmBtn);
-
-  const cancelBtn = document.createElement('button');
-  cancelBtn.className = 'btn btn-secondary';
-  cancelBtn.textContent = 'Cancel';
-  cancelBtn.addEventListener('click', closeModal);
-  actions.appendChild(cancelBtn);
-
-  container.appendChild(actions);
-}
-
-function toggleGemSelection(
-  selected: Map<GemColor, number>,
-  color: GemColor,
-  bank: GemPool,
-  onChange: () => void,
-): void {
-  const cur = selected.get(color) ?? 0;
-  const total = [...selected.values()].reduce((a, b) => a + b, 0);
-  const bankCount = bank[color] ?? 0;
-
-  if (cur === 0) {
-    // Guard: only add if canAddColor allows it
-    if (!canAddColor(color, selected, bank)) return;
-    selected.set(color, 1);
-  } else if (cur === 1) {
-    // Try upgrading to double-take (only if this is the sole colour and bank has ≥4)
-    if (selected.size === 1 && total === 1 && bankCount >= 4) {
-      selected.set(color, 2);
-    } else {
-      selected.delete(color);
-    }
-  } else {
-    // cur === 2: deselect back to 0
-    selected.delete(color);
-  }
-
-  onChange();
-}
-
-function submitGems(selected: Map<GemColor, number>): void {
-  const gems: GemPool = {};
-  for (const [color, count] of selected) {
-    gems[color] = count;
-  }
-  send({ type: 'TAKE_GEMS', gems });
-  closeModal();
-}
-
-// ─── Discard modal ────────────────────────────────────────────────────────────
-
-export function openDiscardModal(excess: number, myGems: GemPool): void {
-  const selected = new Map<GemColorOrGold, number>();
-  let element: HTMLElement;
-
-  function rebuild(): void {
-    element.innerHTML = '';
-    renderDiscardPicker(element, excess, myGems, selected, rebuild);
-  }
-
-  element = document.createElement('div');
-  element.className = 'gem-picker-modal discard-modal';
-  rebuild();
-  openModal(element, false);
-}
-
 // ─── Noble choice modal ──────────────────────────────────────────────────────
 
 export function openNobleChoiceModal(nobles: Noble[]): void {
@@ -331,79 +154,6 @@ export function openNobleChoiceModal(nobles: Noble[]): void {
   openModal(frag);
 }
 
-function renderDiscardPicker(
-  container: HTMLElement,
-  excess: number,
-  myGems: GemPool,
-  selected: Map<GemColorOrGold, number>,
-  onChange: () => void,
-): void {
-  const title = document.createElement('h3');
-  title.textContent = `Discard ${excess} Gem${excess > 1 ? 's' : ''}`;
-  container.appendChild(title);
-
-  const allColors: GemColorOrGold[] = [...GEM_COLORS, 'gold'];
-  const grid = document.createElement('div');
-  grid.className = 'picker-grid';
-
-  const totalSelected = [...selected.values()].reduce((a, b) => a + b, 0);
-
-  for (const color of allColors) {
-    const have = myGems[color] ?? 0;
-    if (have === 0) continue;
-    const sel = selected.get(color) ?? 0;
-
-    const col = document.createElement('div');
-    col.className = 'picker-col discard-picker-col';
-
-    const canAdd = sel < have && totalSelected < excess;
-    const token = renderGemToken(color, have, 'sz-xl', {
-      clickable: sel > 0 || canAdd,
-      selected: sel > 0,
-      onClick: () => {
-        const cur = selected.get(color) ?? 0;
-        const tot = [...selected.values()].reduce((a, b) => a + b, 0);
-        const maxCanAdd = Math.min(have, cur + (excess - tot));
-        if (cur < maxCanAdd) {
-          // Still room to add more of this color
-          selected.set(color, cur + 1);
-        } else {
-          // At max for this color (or quota full) — reset to 0
-          selected.delete(color);
-        }
-        onChange();
-      },
-    });
-    col.appendChild(token);
-
-    const badge = document.createElement('div');
-    badge.className = `picker-info discard-badge${sel > 0 ? '' : ' is-empty'}`;
-    badge.textContent = sel > 0 ? `−${sel}` : '−0';
-    col.appendChild(badge);
-
-    grid.appendChild(col);
-  }
-  container.appendChild(grid);
-
-  const actions = document.createElement('div');
-  actions.className = 'modal-actions';
-
-  const confirmBtn = document.createElement('button');
-  confirmBtn.className = 'btn btn-danger';
-  confirmBtn.textContent = `Discard ${totalSelected}/${excess}`;
-  confirmBtn.disabled = totalSelected !== excess;
-  confirmBtn.addEventListener('click', () => {
-    const gems: GemPool = {};
-    for (const [color, count] of selected) {
-      gems[color as GemColorOrGold] = count;
-    }
-    send({ type: 'DISCARD_GEMS', gems });
-    closeModal();
-  });
-  actions.appendChild(confirmBtn);
-  container.appendChild(actions);
-}
-
 // ─── Modal CSS (injected at module load) ──────────────────────────────────────
 
 const modalStyles = `
@@ -422,37 +172,11 @@ const modalStyles = `
   width: 92%;
   display: flex; flex-direction: column; gap: 22px;
 }
-.modal-box.modal-box-discard {
-  max-width: clamp(560px, 60vw, 800px);
-}
 .modal-box h3 { color: var(--gem-gold); font-size: clamp(1.3rem, 2vw, 1.7rem); }
 .modal-box p { color: var(--text-muted); font-size: clamp(0.95rem, 1.2vw, 1.1rem); line-height: 1.6; }
 .modal-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: flex-end; }
 .card-modal { display: flex; flex-direction: column; gap: 22px; align-items: center; }
 .picker-hint { font-size: clamp(0.9rem, 1.1vw, 1.05rem); color: var(--text-muted); text-align: center; }
-.picker-grid { display: flex; gap: clamp(16px, 2vw, 28px); justify-content: center; flex-wrap: wrap; }
-.picker-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.picker-info { font-size: clamp(0.95rem, 1.2vw, 1.2rem); color: var(--text-muted); font-weight: 600; }
-.gem-picker-modal { display: flex; flex-direction: column; gap: 22px; align-items: center; }
-.discard-modal { align-items: stretch; width: 100%; }
-.discard-modal .picker-grid {
-  justify-content: space-between;
-  flex-wrap: nowrap;
-}
-.discard-modal .discard-picker-col {
-  flex-direction: row;
-  min-width: 72px;
-  justify-content: center;
-}
-.discard-modal .discard-badge {
-  min-width: 32px;
-  text-align: left;
-  font-weight: 700;
-}
-.discard-modal .discard-badge.is-empty {
-  visibility: hidden;
-}
-.discard-modal .modal-actions { width: 100%; margin-top: 12px; }
 .noble-choice-modal { display: flex; flex-direction: column; gap: 18px; align-items: center; }
 .noble-choice-row { display: flex; gap: clamp(14px, 2vw, 24px); flex-wrap: wrap; justify-content: center; }
 .noble-choice-btn {

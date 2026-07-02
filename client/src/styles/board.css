@@ -568,3 +568,175 @@
     gap: 4px;
   }
 }
+
+/* ─── Discard mode: bank panel repurposed as a discard picker ─────────────
+   The DOM skeleton (bank-panel > bank-row-primary + bank-row-secondary) is
+   preserved so all existing breakpoints keep working — we just repaint the
+   surface in red and swap the badge/title styles. The −N badge lives in the
+   same gap-separated `.bank-gem-multi` slot as the take-mode `xN` badge, so
+   token and badge can never overlap. */
+
+@keyframes discard-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(220, 60, 60, 0.55), 0 0 12px rgba(220, 60, 60, 0.25); }
+  50%      { box-shadow: 0 0 0 1px rgba(255, 100, 100, 0.9),  0 0 20px rgba(255, 90, 90, 0.55); }
+}
+
+.bank-panel.discard-mode {
+  background: linear-gradient(180deg, rgba(80, 20, 20, 0.55), rgba(50, 12, 12, 0.55));
+  border: 1px solid rgba(220, 80, 80, 0.7);
+  animation: discard-pulse 2.2s ease-in-out infinite;
+  position: relative;
+}
+
+/* Diagonal warning stripes on the very top edge — obvious visual signal
+   that this panel is no longer the bank. */
+.bank-panel.discard-mode::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+  background: repeating-linear-gradient(
+    45deg,
+    #d94040 0 8px,
+    #2a0d0d 8px 16px
+  );
+  pointer-events: none;
+}
+
+.bank-panel.discard-mode .bank-title.discard-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  color: #ffd6d6;
+  letter-spacing: 0.08em;
+  padding-top: 6px; /* leave room for the stripe */
+}
+
+.discard-title-icon {
+  display: inline-block;
+  color: #ffb84d;
+  font-size: 1.05rem;
+  margin-right: 6px;
+  text-shadow: 0 0 6px rgba(255, 180, 60, 0.6);
+}
+
+.discard-title-text {
+  display: inline;
+  font-size: 0.98rem;
+  font-weight: 900;
+  color: #ffe3e3;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.discard-title-sub {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(255, 200, 200, 0.75);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+/* Gem row: only shows colours the player actually has, so it stays tidy. */
+.bank-panel.discard-mode .discard-gems {
+  /* Uses the same .bank-select-gems flex/grid rules from breakpoints. */
+}
+
+.bank-panel.discard-mode .discard-gem-item {
+  /* Extra emphasis when a gem is selected for discard. */
+}
+
+.bank-panel.discard-mode .discard-gem-item.is-selected .gem-token {
+  outline-color: #ff8080 !important;
+  box-shadow:
+    inset 0 -2px 4px rgba(0,0,0,0.25),
+    0 0 0 1px rgba(0,0,0,0.35),
+    0 2px 6px rgba(0,0,0,0.3),
+    0 0 12px rgba(255, 90, 90, 0.6) !important;
+}
+
+/* Red −N badge (reuses .bank-gem-multi slot so it cannot overlap the token). */
+.bank-panel.discard-mode .discard-badge {
+  background: #b02828;
+  color: #fff;
+  border: 1px solid rgba(255, 140, 140, 0.7);
+  font-weight: 900;
+}
+
+.bank-panel.discard-mode .discard-badge.is-empty {
+  visibility: hidden;
+}
+
+/* Hint text becomes urgent-but-readable. */
+.bank-panel.discard-mode .discard-hint {
+  border-color: rgba(255, 120, 120, 0.4);
+  background: rgba(80, 15, 15, 0.55);
+  color: #ffdcdc;
+}
+
+/* Danger button styling for Confirm Discard — .btn-danger already exists,
+   but ensure it stays prominent when disabled. */
+.bank-panel.discard-mode .discard-confirm-btn {
+  min-width: 9.5rem;
+}
+
+/* Landscape (bank is a narrow vertical column): stack the actions below the
+   hint just like the take-mode layout. The primary/secondary rows already
+   flex-direction: column at this breakpoint, so nothing else to do. */
+@media (orientation: landscape) and (min-width: 900px) {
+  .bank-panel.discard-mode .discard-title-text {
+    font-size: clamp(0.82rem, 1vw, 1.05rem);
+  }
+  .bank-panel.discard-mode .discard-title-sub {
+    font-size: clamp(0.58rem, 0.75vw, 0.75rem);
+  }
+  .bank-panel.discard-mode .discard-confirm-btn {
+    min-width: 0;
+    width: 100%;
+  }
+  .bank-panel.discard-mode .discard-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 6px;
+  }
+}
+
+/* Phone portrait: shrink badge to match the tight gem grid so nothing
+   crowds the token. In discard mode the grid may hold 1-6 colours (only
+   what the player owns), so switch from the fixed 5-col bank grid to
+   auto-fit so it stays tight regardless of count. */
+@media (orientation: portrait) and (max-width: 699px) {
+  .bank-panel.discard-mode .discard-gems {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(52px, 1fr));
+    gap: 6px;
+    width: 100%;
+  }
+  .bank-panel.discard-mode .discard-title-text {
+    font-size: 0.86rem;
+  }
+  .bank-panel.discard-mode .discard-title-sub {
+    font-size: 0.62rem;
+  }
+  .bank-panel.discard-mode .discard-badge {
+    min-width: 22px;
+    padding: 1px 4px;
+    font-size: 0.62rem;
+  }
+  .bank-panel.discard-mode .discard-confirm-btn {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+}
+
+/* Tablet portrait: bank rows are horizontal. Keep discard gems in a tidy
+   horizontal row without the strict 5-col grid. */
+@media (orientation: portrait) and (min-width: 700px) {
+  .bank-panel.discard-mode .discard-gems {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+}

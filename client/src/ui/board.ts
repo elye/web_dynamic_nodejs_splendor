@@ -1,4 +1,4 @@
-import type { GameState, Card, CardTier, GemColor, GemColorOrGold, PlayerState } from '@splendor/shared';
+import type { GameState, Card, CardTier, GemColor, GemColorOrGold, GemPool, PlayerState } from '@splendor/shared';
 import { GEM_COLORS } from '@splendor/shared';
 import { renderCard, renderDeckPlaceholder, renderNobleTile, renderGemToken } from './card.js';
 
@@ -10,11 +10,25 @@ export interface BoardCallbacks {
   isMyTurn: boolean;
 }
 
+/**
+ * Discard mode transforms the bank panel into a picker over the player's own
+ * gems, so they can decide which to drop while still seeing the board.
+ */
+export interface BankDiscardMode {
+  excess: number;
+  myGems: GemPool;
+  selection: Map<GemColorOrGold, number>;
+  onGemClick: (color: GemColorOrGold) => void;
+  onConfirm: () => void;
+  onReset: () => void;
+}
+
 export interface BankCallbacks {
   onGemClick: (color: GemColorOrGold) => void;
   onConfirmTakeGems: () => void;
   onClearGemSelection: () => void;
   isMyTurn: boolean;
+  discardMode?: BankDiscardMode;
 }
 
 // ─── Main board renderer ──────────────────────────────────────────────────────
@@ -79,9 +93,17 @@ export function renderBankPanel(
   selectedGems: Map<GemColorOrGold, number>,
   selectionHint: string,
 ): void {
-  const isPortrait = window.matchMedia('(orientation: portrait)').matches;
-
   container.innerHTML = '';
+
+  // Discard mode fully replaces the bank UI — the same panel becomes a picker
+  // over the player's own gems, so the board / cards stay visible.
+  if (cb.discardMode) {
+    container.className = 'bank-panel discard-mode';
+    renderDiscardBank(container, cb.discardMode);
+    return;
+  }
+
+  const isPortrait = window.matchMedia('(orientation: portrait)').matches;
   container.className = 'bank-panel';
 
   const title = document.createElement('div');
@@ -170,6 +192,104 @@ export function renderBankPanel(
   const hint = document.createElement('div');
   hint.className = 'bank-selection-hint';
   hint.textContent = selectionHint;
+  secondaryRow.appendChild(hint);
+
+  container.appendChild(secondaryRow);
+}
+
+// ─── Discard mode: repurpose the bank panel as a discard picker ──────────────
+
+function renderDiscardBank(container: HTMLElement, mode: BankDiscardMode): void {
+  const allColors: GemColorOrGold[] = [...GEM_COLORS, 'gold'];
+  const totalSelected = [...mode.selection.values()].reduce((a, b) => a + b, 0);
+  const remaining = mode.excess - totalSelected;
+
+  // Header — clearly not a bank anymore: red glyph + "Discard N/M".
+  const title = document.createElement('div');
+  title.className = 'bank-title discard-title';
+  const icon = document.createElement('span');
+  icon.className = 'discard-title-icon';
+  icon.textContent = '⚠';
+  title.appendChild(icon);
+  const titleText = document.createElement('span');
+  titleText.className = 'discard-title-text';
+  titleText.textContent = `Discard ${totalSelected}/${mode.excess}`;
+  title.appendChild(titleText);
+  const titleSub = document.createElement('span');
+  titleSub.className = 'discard-title-sub';
+  titleSub.textContent = 'Over the 10-gem limit';
+  title.appendChild(titleSub);
+  container.appendChild(title);
+
+  // Gem grid — player's OWN gems. Zero-count colours are omitted so the row
+  // stays tidy on landscape (vertical) and phone portrait (5-col grid).
+  const primaryRow = document.createElement('div');
+  primaryRow.className = 'bank-row bank-row-primary';
+
+  const grid = document.createElement('div');
+  grid.className = 'bank-select-gems discard-gems';
+
+  const visibleColors = allColors.filter((c) => (mode.myGems[c] ?? 0) > 0);
+  for (const color of visibleColors) {
+    const have = mode.myGems[color] ?? 0;
+    const sel = mode.selection.get(color) ?? 0;
+    const isSelected = sel > 0;
+    // A gem is clickable if we still have room to add OR the player wants
+    // to cycle back down (deselect the last tick of this colour).
+    const canAdd = sel < have && remaining > 0;
+    const canClick = canAdd || sel > 0;
+
+    const item = document.createElement('div');
+    item.className = `bank-gem-item discard-gem-item${isSelected ? ' is-selected' : ''}`;
+
+    const token = renderGemToken(color, have, 'sz-md', {
+      clickable: canClick,
+      selected: isSelected,
+      disabled: !canClick,
+      onClick: canClick ? () => mode.onGemClick(color) : undefined,
+    });
+    item.appendChild(token);
+
+    const badge = document.createElement('span');
+    badge.className = `bank-gem-multi discard-badge${isSelected ? '' : ' is-empty'}`;
+    badge.textContent = isSelected ? `−${sel}` : '−0';
+    item.appendChild(badge);
+
+    grid.appendChild(item);
+  }
+  primaryRow.appendChild(grid);
+  container.appendChild(primaryRow);
+
+  // Actions + hint row
+  const secondaryRow = document.createElement('div');
+  secondaryRow.className = 'bank-row bank-row-secondary';
+
+  const actions = document.createElement('div');
+  actions.className = 'bank-actions discard-actions';
+
+  const confirmBtn = document.createElement('button');
+  confirmBtn.className = 'btn btn-danger btn-sm discard-confirm-btn';
+  confirmBtn.textContent = `Confirm Discard (${totalSelected}/${mode.excess})`;
+  confirmBtn.disabled = totalSelected !== mode.excess;
+  confirmBtn.addEventListener('click', () => mode.onConfirm());
+  actions.appendChild(confirmBtn);
+
+  const resetBtn = document.createElement('button');
+  resetBtn.className = 'btn btn-secondary btn-sm discard-reset-btn';
+  resetBtn.textContent = 'Reset';
+  resetBtn.disabled = totalSelected === 0;
+  resetBtn.addEventListener('click', () => mode.onReset());
+  actions.appendChild(resetBtn);
+
+  secondaryRow.appendChild(actions);
+
+  const hint = document.createElement('div');
+  hint.className = 'bank-selection-hint discard-hint';
+  hint.textContent = totalSelected === mode.excess
+    ? 'Ready — tap Confirm Discard.'
+    : totalSelected === 0
+      ? `Pick ${mode.excess} gem${mode.excess > 1 ? 's' : ''} to drop. Tap a gem to add, tap again to remove.`
+      : `Pick ${remaining} more gem${remaining > 1 ? 's' : ''}, or tap a selected gem to remove.`;
   secondaryRow.appendChild(hint);
 
   container.appendChild(secondaryRow);

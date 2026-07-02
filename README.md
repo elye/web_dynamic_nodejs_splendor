@@ -57,7 +57,7 @@ web-socket-splendor/
         │   ├── board.ts      # Game board (nobles, tier rows, gem bank)
         │   ├── card.ts       # Card, deck placeholder, noble tile, gem token elements
         │   ├── player-panel.ts  # Opponent strips + own full panel
-        │   └── action-modal.ts  # Gem picker, card buy/reserve, discard modals
+        │   └── action-modal.ts  # Card buy/reserve, deck-reserve, noble-choice modals
         └── styles/
             ├── base.css      # Reset, layout, lobby, buttons, toasts
             ├── cards.css     # Card tier styles, noble tiles, deck placeholders
@@ -116,8 +116,11 @@ Both are served from **http://localhost:3000**.
 1. **Host** opens the app, enters a name, chooses total players (2–4), optionally marks slots as AI and picks difficulty, then clicks **Create Room**.
 2. **Guests** enter a name and the 4-character room code, then click **Join Room**.
 3. Once all human slots are filled, the host clicks **Start Game**.
-4. On your turn, click a gem token to open the gem picker, or click a card to buy or reserve it. Confirm your move in the modal.
-5. First player to reach 15 prestige points triggers the final round. Highest score after the round ends wins (tiebreak: fewest development cards).
+4. On your turn:
+   - **Take gems** — click gems directly in the bank panel to build a selection (up to 3 different colours, or 2 of the same when that pile has ≥ 4), then press **Take Selected**. Use **Clear** to reset.
+   - **Buy or reserve a card** — click a card and confirm the action in the modal.
+5. If a turn leaves you holding more than 10 gems, the bank panel switches into a red **Discard** picker over your own gems — pick which to drop and confirm. The board stays visible so you can plan the trade-off.
+6. First player to reach 15 prestige points triggers the final round. Highest score after the round ends wins (tiebreak: fewest development cards).
 
 ## Architecture Notes
 

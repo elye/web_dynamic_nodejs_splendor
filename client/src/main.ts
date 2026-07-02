@@ -14,7 +14,6 @@ import { renderOpponentStrip, renderMyPanel } from './ui/player-panel.js';
 import {
   openCardModal,
   openDeckReserveModal,
-  openDiscardModal,
   openNobleChoiceModal,
   closeModal,
 } from './ui/action-modal.js';
@@ -93,13 +92,18 @@ onMessage((msg) => {
           }
         }
       }
-      // If there's a pending discard/noble choice for the local player, show modal.
+      // Noble choice still uses a modal (it needs full attention & is short).
+      // Discard is handled INLINE via the my-panel bar so the player can still
+      // see the board / cards / opponents while deciding what to drop.
       const { myPlayerId } = getState();
       const discard = msg.state.pendingDiscard;
       const nobleChoice = msg.state.pendingNobleChoice;
-      if (discard && discard.playerId === myPlayerId) {
-        openDiscardModal(discard.excess, msg.state.players.find(p => p.id === myPlayerId)?.gems ?? {});
-      } else if (nobleChoice && nobleChoice.playerId === myPlayerId) {
+      // Reset the inline discard selection whenever discard state changes owner
+      // or clears, so it never leaks across turns/players.
+      if (!discard || discard.playerId !== myPlayerId) {
+        discardSelection.clear();
+      }
+      if (nobleChoice && nobleChoice.playerId === myPlayerId) {
         openNobleChoiceModal(nobleChoice.nobles);
       } else {
         closeModal();
@@ -150,6 +154,8 @@ function render(state: AppState): void {
 
 // Track selected gems across renders (persists during a turn)
 const selectedGems = new Map<GemColorOrGold, number>();
+// Track gems selected for inline discard (used when pendingDiscard targets us)
+const discardSelection = new Map<GemColorOrGold, number>();
 let lastTurnToastKey: string | null = null;
 
 subscribe(render);
@@ -252,6 +258,35 @@ function sendTakeSelectedGems(): void {
   selectedGems.clear();
 }
 
+// ─── Inline discard flow ─────────────────────────────────────────────────────
+
+function toggleDiscardGem(color: GemColorOrGold, myGems: GemPool, excess: number): void {
+  const have = myGems[color] ?? 0;
+  if (have === 0) return;
+  const cur = discardSelection.get(color) ?? 0;
+  const totalOther = [...discardSelection.entries()]
+    .filter(([c]) => c !== color)
+    .reduce((s, [, n]) => s + n, 0);
+  const room = excess - totalOther;
+  // Cycle: 0 → 1 → 2 → ... → min(have, room) → 0
+  const max = Math.min(have, room);
+  if (cur >= max) {
+    discardSelection.delete(color);
+  } else {
+    discardSelection.set(color, cur + 1);
+  }
+}
+
+function sendDiscardSelection(): void {
+  const gems: GemPool = {};
+  for (const [color, count] of discardSelection) {
+    if (count > 0) gems[color] = count;
+  }
+  if (Object.keys(gems).length === 0) return;
+  send({ type: 'DISCARD_GEMS', gems });
+  discardSelection.clear();
+}
+
 function renderGameScreen(state: AppState): void {
   const { game, myPlayerId } = state;
   if (!game) return;
@@ -269,6 +304,19 @@ function renderGameScreen(state: AppState): void {
     selectedGems.clear();
   } else {
     sanitizeBankSelection(game.bank);
+  }
+
+  // Sanitize inline discard selection against the latest hand + excess
+  if (game.pendingDiscard && game.pendingDiscard.playerId === myPlayerId && myPlayer) {
+    let running = 0;
+    for (const [color, count] of [...discardSelection.entries()]) {
+      const have = myPlayer.gems[color] ?? 0;
+      const room = game.pendingDiscard.excess - running;
+      const clamped = Math.min(count, have, Math.max(0, room));
+      if (clamped <= 0) discardSelection.delete(color);
+      else discardSelection.set(color, clamped);
+      running += clamped;
+    }
   }
 
   // Game over overlay
@@ -385,6 +433,9 @@ function renderGameScreen(state: AppState): void {
   center.appendChild(boardArea);
 
   const bankPanel = document.createElement('div');
+  const isPendingDiscardMine = Boolean(
+    game.pendingDiscard && game.pendingDiscard.playerId === myPlayerId,
+  );
   renderBankPanel(bankPanel, game, {
     isMyTurn,
     onGemClick: (color: GemColorOrGold) => {
@@ -400,6 +451,26 @@ function renderGameScreen(state: AppState): void {
       selectedGems.clear();
       render(getState());
     },
+    discardMode: isPendingDiscardMine && game.pendingDiscard && myPlayer
+      ? {
+          excess: game.pendingDiscard.excess,
+          myGems: myPlayer.gems,
+          selection: discardSelection,
+          onGemClick: (color) => {
+            if (!game.pendingDiscard || !myPlayer) return;
+            toggleDiscardGem(color, myPlayer.gems, game.pendingDiscard.excess);
+            render(getState());
+          },
+          onConfirm: () => {
+            sendDiscardSelection();
+            render(getState());
+          },
+          onReset: () => {
+            discardSelection.clear();
+            render(getState());
+          },
+        }
+      : undefined,
   }, selectedGems, bankSelectionHint(selectedGems, game.bank));
   center.appendChild(bankPanel);
 
