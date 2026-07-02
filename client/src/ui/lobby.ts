@@ -104,9 +104,9 @@ function renderEntryScreen(): HTMLElement {
 }
 
 const AI_CHARACTERS: Array<{ value: AiDifficulty; label: string }> = [
-  { value: 'easy',   label: 'Estaria (Easy)' },
-  { value: 'medium', label: 'Midarvy (Medium)' },
-  { value: 'hard',   label: 'Hadie (Hard)' },
+  { value: 'easy',   label: 'Estaria' },
+  { value: 'medium', label: 'Midarvy' },
+  { value: 'hard',   label: 'Hadie' },
 ];
 
 function renderAiSlotsConfig(container: HTMLDivElement, total: number): void {
