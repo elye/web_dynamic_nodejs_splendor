@@ -293,3 +293,148 @@
     border-radius: 9px;
   }
 }
+
+/* ─── Inline discard flow (non-modal) ───────────────────────────────────── */
+
+/* Highlight the my-panel bar with a red glow while a discard is pending. */
+.my-panel-bar.discard-active {
+  border-top-color: var(--gem-red, #b03030);
+  background: linear-gradient(180deg, rgba(120, 30, 30, 0.95), rgba(80, 20, 20, 0.95));
+  box-shadow: 0 -2px 12px rgba(255, 90, 90, 0.25);
+}
+
+/* Banner sits in the my-turn-section slot when discarding. Content stacks
+   vertically so the title / hint / buttons never sit on top of each other. */
+.discard-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 120, 120, 0.55);
+  background: rgba(120, 20, 20, 0.35);
+  min-width: 11rem;
+}
+
+.discard-banner-title {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #ffd6d6;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.discard-banner-hint {
+  font-size: 0.78rem;
+  color: rgba(255, 220, 220, 0.85);
+  line-height: 1.2;
+}
+
+.discard-banner-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.discard-banner-actions .btn {
+  padding: 4px 12px;
+  font-size: 0.82rem;
+  border-radius: 6px;
+}
+
+/* ── Per-gem discard picker inside .my-gems-grid ────────────────────────── */
+
+/* In discard mode, the slot has THREE children stacked (portrait) or
+   inline (landscape): token, count, −N badge. Explicit gap prevents any
+   overlap between token and count/badge. */
+.my-panel.discard-mode .my-gem-slot {
+  gap: 4px;
+}
+
+/* Dim slots that have zero gems of this color — nothing to discard. */
+.my-panel.discard-mode .my-gem-slot.is-empty {
+  opacity: 0.32;
+  filter: grayscale(0.4);
+}
+
+/* Give an affordance hint (thin outline) to slots that can still accept
+   another discard tick. */
+.my-panel.discard-mode .my-gem-slot.can-add .gem-token {
+  outline: 1px dashed rgba(255, 255, 255, 0.35);
+  outline-offset: 2px;
+}
+
+/* The −N badge sits BELOW (portrait) or AFTER (landscape) the count. It is
+   a normal flex child, NOT absolutely positioned, so it cannot overlap the
+   gem token or count text. */
+.my-gem-discard-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #ffd6d6;
+  background: rgba(180, 30, 30, 0.75);
+  padding: 1px 6px;
+  border-radius: 4px;
+  min-width: 24px;
+  text-align: center;
+  line-height: 1.15;
+  border: 1px solid rgba(255, 120, 120, 0.55);
+}
+
+.my-gem-discard-badge.is-empty {
+  visibility: hidden; /* preserve layout, no overlap */
+}
+
+/* Landscape: banner + gems live on one row. Keep enough gap so the banner
+   never bleeds into the Gems section, and keep the three parts of each slot
+   on a single row with clear spacing. */
+@media (orientation: landscape) and (min-width: 900px) {
+  .discard-banner {
+    padding: 8px 14px;
+    min-width: 13rem;
+  }
+  .discard-banner-title {
+    font-size: 1.1rem;
+  }
+  .discard-banner-hint {
+    font-size: 0.86rem;
+  }
+  .discard-banner-actions .btn {
+    font-size: 0.92rem;
+    padding: 5px 14px;
+  }
+  .my-panel.discard-mode .my-gem-slot {
+    /* row layout already inherited; increase gap so token, count, badge
+       are visually distinct with no overlap. */
+    gap: 8px;
+  }
+  .my-gem-discard-badge {
+    font-size: 0.86rem;
+    padding: 2px 8px;
+    min-width: 30px;
+  }
+}
+
+/* Portrait / narrow: the my-panel is a horizontal scroller; make sure the
+   banner keeps its own column and the badge sits below the count. */
+@media (orientation: portrait), (max-width: 899px) {
+  .my-panel.discard-mode {
+    flex-wrap: wrap;
+  }
+  .my-panel.discard-mode .my-turn-section {
+    order: -1;
+    flex-basis: 100%;
+  }
+  .discard-banner {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+  }
+  .discard-banner-hint {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}

@@ -118,25 +118,6 @@
   margin-bottom: 8px;
 }
 
-.discard-picker-col {
-  position: relative;
-}
-
-.discard-badge {
-  font-size: 0.7rem;
-  font-weight: 700;
-  background: rgba(255,255,255,0.15);
-  color: var(--text-muted);
-  padding: 2px 8px;
-  border-radius: 4px;
-  min-width: 32px;
-  text-align: center;
-}
-
-.discard-badge.is-empty {
-  opacity: 0.5;
-}
-
 /* ─── Mobile-specific sizing ──────────────────────────────────────────────── */
 @media (orientation: portrait) and (max-width: 699px) {
   /* Arrange gems in 2 rows on portrait phone */
