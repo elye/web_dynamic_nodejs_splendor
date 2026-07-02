@@ -89,46 +89,9 @@
 .gem-pip.black { background: var(--gem-black); }
 .gem-pip.gold  { background: var(--gem-gold); }
 
-/* ─── Gem picker modal ────────────────────────────────────────────────────── */
-.picker-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-  margin: 16px 0;
-}
-
-.picker-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.picker-info {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  text-align: center;
-  min-width: 60px;
-}
-
+/* ─── Shared picker hint (still used by the noble-choice modal) ───────────── */
 .picker-hint {
   color: var(--text-muted);
   font-size: 0.85rem;
   margin-bottom: 8px;
-}
-
-/* ─── Mobile-specific sizing ──────────────────────────────────────────────── */
-@media (orientation: portrait) and (max-width: 699px) {
-  /* Arrange gems in 2 rows on portrait phone */
-  .modal-box .picker-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    max-width: 310px;
-  }
-
-  .modal-box .picker-col {
-    justify-self: center;
-  }
 }
