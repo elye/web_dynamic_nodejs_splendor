@@ -433,6 +433,9 @@ function renderGameScreen(state: AppState): void {
   center.appendChild(boardArea);
 
   const bankPanel = document.createElement('div');
+  const isPendingDiscardMine = Boolean(
+    game.pendingDiscard && game.pendingDiscard.playerId === myPlayerId,
+  );
   renderBankPanel(bankPanel, game, {
     isMyTurn,
     onGemClick: (color: GemColorOrGold) => {
@@ -448,6 +451,26 @@ function renderGameScreen(state: AppState): void {
       selectedGems.clear();
       render(getState());
     },
+    discardMode: isPendingDiscardMine && game.pendingDiscard && myPlayer
+      ? {
+          excess: game.pendingDiscard.excess,
+          myGems: myPlayer.gems,
+          selection: discardSelection,
+          onGemClick: (color) => {
+            if (!game.pendingDiscard || !myPlayer) return;
+            toggleDiscardGem(color, myPlayer.gems, game.pendingDiscard.excess);
+            render(getState());
+          },
+          onConfirm: () => {
+            sendDiscardSelection();
+            render(getState());
+          },
+          onReset: () => {
+            discardSelection.clear();
+            render(getState());
+          },
+        }
+      : undefined,
   }, selectedGems, bankSelectionHint(selectedGems, game.bank));
   center.appendChild(bankPanel);
 
@@ -455,13 +478,7 @@ function renderGameScreen(state: AppState): void {
 
   // ── My panel bar ──
   const myPanelBar = document.createElement('div');
-  const isPendingDiscardMine = Boolean(
-    game.pendingDiscard && game.pendingDiscard.playerId === myPlayerId,
-  );
-  const barClasses = ['my-panel-bar'];
-  if (isMyTurn) barClasses.push('my-turn');
-  if (isPendingDiscardMine) barClasses.push('discard-active');
-  myPanelBar.className = barClasses.join(' ');
+  myPanelBar.className = `my-panel-bar${isMyTurn ? ' my-turn' : ''}`;
 
   const myPanelEl = document.createElement('div');
   if (myPlayer) {
@@ -476,25 +493,6 @@ function renderGameScreen(state: AppState): void {
         return gold <= (myPlayer.gems['gold'] ?? 0);
       },
       onReservedCardClick: (card) => openCardModal(card, true, myPlayer),
-      discardMode: isPendingDiscardMine && game.pendingDiscard
-        ? {
-            excess: game.pendingDiscard.excess,
-            selection: discardSelection,
-            onGemClick: (color) => {
-              if (!game.pendingDiscard) return;
-              toggleDiscardGem(color, myPlayer.gems, game.pendingDiscard.excess);
-              render(getState());
-            },
-            onConfirm: () => {
-              sendDiscardSelection();
-              render(getState());
-            },
-            onReset: () => {
-              discardSelection.clear();
-              render(getState());
-            },
-          }
-        : undefined,
     });
   }
   myPanelBar.appendChild(myPanelEl);

@@ -1,16 +1,6 @@
-import type { PlayerState, GemColor, GemColorOrGold } from '@splendor/shared';
+import type { PlayerState, GemColor } from '@splendor/shared';
 import { GEM_COLORS } from '@splendor/shared';
 import { renderCard, renderGemToken, renderNobleTile } from './card.js';
-
-// ─── Discard mode (inline, non-modal) ────────────────────────────────────────
-
-export interface DiscardMode {
-  excess: number;
-  selection: Map<GemColorOrGold, number>;
-  onGemClick: (color: GemColorOrGold) => void;
-  onConfirm: () => void;
-  onReset: () => void;
-}
 
 // ─── Opponent strip ───────────────────────────────────────────────────────────
 
@@ -92,7 +82,6 @@ export interface MyPanelCallbacks {
   onReservedCardClick: (card: import('@splendor/shared').Card) => void;
   isMyTurn: boolean;
   canAfford: (card: import('@splendor/shared').Card) => boolean;
-  discardMode?: DiscardMode;
 }
 
 export function renderMyPanel(
@@ -101,18 +90,14 @@ export function renderMyPanel(
   cb: MyPanelCallbacks,
 ): void {
   container.innerHTML = '';
-  container.className = 'my-panel' + (cb.discardMode ? ' discard-mode' : '');
+  container.className = 'my-panel';
 
   const turnSection = document.createElement('div');
   turnSection.className = 'my-panel-section my-turn-section';
-  if (cb.discardMode) {
-    turnSection.appendChild(renderDiscardBanner(cb.discardMode));
-  } else {
-    const turnLabel = document.createElement('div');
-    turnLabel.className = `my-turn-label${cb.isMyTurn ? '' : ' is-waiting'}`;
-    turnLabel.textContent = cb.isMyTurn ? 'Your Turn' : 'Waiting';
-    turnSection.appendChild(turnLabel);
-  }
+  const turnLabel = document.createElement('div');
+  turnLabel.className = `my-turn-label${cb.isMyTurn ? '' : ' is-waiting'}`;
+  turnLabel.textContent = cb.isMyTurn ? 'Your Turn' : 'Waiting';
+  turnSection.appendChild(turnLabel);
   container.appendChild(turnSection);
 
   // ── Points ──
@@ -130,51 +115,15 @@ export function renderMyPanel(
   const gemsGrid = document.createElement('div');
   gemsGrid.className = 'my-gems-grid';
   const allColors: (GemColor | 'gold')[] = [...GEM_COLORS, 'gold'];
-  const discard = cb.discardMode;
-  const totalSelected = discard
-    ? [...discard.selection.values()].reduce((a, b) => a + b, 0)
-    : 0;
   for (const color of allColors) {
     const count = player.gems[color] ?? 0;
     const slot = document.createElement('div');
     slot.className = 'my-gem-slot';
-
-    const sel = discard ? (discard.selection.get(color) ?? 0) : 0;
-    const remainingAfter = count - sel;
-
-    if (discard) {
-      const canClick = count > 0;
-      const canAdd = sel < count && totalSelected < discard.excess;
-      const token = renderGemToken(color, undefined, 'sz-sm', {
-        clickable: canClick,
-        selected: sel > 0,
-        disabled: !canClick,
-        onClick: canClick ? () => discard.onGemClick(color) : undefined,
-      });
-      slot.appendChild(token);
-
-      const cnt = document.createElement('div');
-      cnt.className = 'my-gem-count';
-      cnt.textContent = sel > 0 ? `${remainingAfter}` : String(count);
-      slot.appendChild(cnt);
-
-      const badge = document.createElement('div');
-      badge.className = `my-gem-discard-badge${sel > 0 ? '' : ' is-empty'}`;
-      badge.textContent = sel > 0 ? `−${sel}` : '−';
-      slot.appendChild(badge);
-
-      // Dim the whole slot when no gems of this color and nothing selected
-      if (!canClick) slot.classList.add('is-empty');
-      // Extra affordance hint when we can still add more
-      if (canAdd) slot.classList.add('can-add');
-    } else {
-      slot.appendChild(renderGemToken(color, undefined, 'sz-sm'));
-      const cnt = document.createElement('div');
-      cnt.className = 'my-gem-count';
-      cnt.textContent = String(count);
-      slot.appendChild(cnt);
-    }
-
+    slot.appendChild(renderGemToken(color, undefined, 'sz-sm'));
+    const cnt = document.createElement('div');
+    cnt.className = 'my-gem-count';
+    cnt.textContent = String(count);
+    slot.appendChild(cnt);
     gemsGrid.appendChild(slot);
   }
   gemSection.appendChild(gemsGrid);
@@ -235,44 +184,4 @@ function makeSection(label: string): HTMLElement {
   lbl.textContent = label;
   el.appendChild(lbl);
   return el;
-}
-
-function renderDiscardBanner(mode: DiscardMode): HTMLElement {
-  const wrap = document.createElement('div');
-  wrap.className = 'discard-banner';
-
-  const title = document.createElement('div');
-  title.className = 'discard-banner-title';
-  const totalSelected = [...mode.selection.values()].reduce((a, b) => a + b, 0);
-  title.textContent = `Discard ${totalSelected}/${mode.excess}`;
-  wrap.appendChild(title);
-
-  const hint = document.createElement('div');
-  hint.className = 'discard-banner-hint';
-  hint.textContent = totalSelected === mode.excess
-    ? 'Ready. Confirm below.'
-    : 'Tap your gems to drop them.';
-  wrap.appendChild(hint);
-
-  const actions = document.createElement('div');
-  actions.className = 'discard-banner-actions';
-
-  const confirm = document.createElement('button');
-  confirm.type = 'button';
-  confirm.className = 'btn btn-danger discard-confirm-btn';
-  confirm.textContent = 'Confirm';
-  confirm.disabled = totalSelected !== mode.excess;
-  confirm.addEventListener('click', () => mode.onConfirm());
-  actions.appendChild(confirm);
-
-  const reset = document.createElement('button');
-  reset.type = 'button';
-  reset.className = 'btn btn-secondary discard-reset-btn';
-  reset.textContent = 'Reset';
-  reset.disabled = totalSelected === 0;
-  reset.addEventListener('click', () => mode.onReset());
-  actions.appendChild(reset);
-
-  wrap.appendChild(actions);
-  return wrap;
 }
